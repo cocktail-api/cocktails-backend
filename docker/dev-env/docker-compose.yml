@@ -1,0 +1,27 @@
+version: '3.3'
+services:
+  postgres:
+    image: postgres:12.2-alpine
+    environment:
+      POSTGRES_PASSWORD: verysecure
+      POSTGRES_USER: dev
+      POSTGRES_DB: cocktails
+    ports:
+      - "54321:5432"
+    restart: always
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - 9090:9090
+    expose:
+      - 9090
+    extra_hosts:
+      - "host.docker.internal:172.17.0.1"
+  grafana:
+    image: grafana/grafana
+    ports:
+      - 3000:3000
+    extra_hosts:
+      - "host.docker.internal:172.17.0.1"

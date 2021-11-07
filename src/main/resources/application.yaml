@@ -1,0 +1,31 @@
+logging:
+  level:
+    org:
+      jdbi:
+        sql: DEBUG
+management:
+  server:
+    port: 8091
+  endpoints:
+    web:
+      exposure:
+        include:
+          - health
+          - info
+          - metrics
+          - prometheus
+  endpoint:
+    prometheus:
+      enabled: true
+    health:
+      probes:
+        enabled: true
+    metrics:
+      enabled: true
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true
+    db:
+      enabled: true
