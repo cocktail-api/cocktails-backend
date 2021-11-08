@@ -40,3 +40,6 @@ jobs:
         env:
           MAVEN_USERNAME: ${{ github.actor }}
           MAVEN_PASSWORD: ${{ github.token }}
+      - name: Push docker image
+        if: ${{ github.event_name == 'push' && github.ref == 'ref/head/main' }}
+        run: echo "Pretending to push docker image"
