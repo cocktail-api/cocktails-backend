@@ -3,4 +3,4 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:54321/cocktails
     username: dev
-    password: verysecures
+    password: verysecure
