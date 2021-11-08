@@ -24,8 +24,8 @@ repositories {
         // githubMavenUser=yourGithubUserName
         // githubMavenPassword=yourGeneratedPAT
         credentials {
-            username = githubMavenUser ?: System.getenv("MAVEN_USERNAME")
-            password = githubMavenPassword ?: System.getenv("MAVEN_PASSWORD")
+            username = hasProperty("githubMavenUser") ? githubMavenUser : System.getenv("MAVEN_USERNAME")
+            password = hasProperty("githubMavenPassword") ? githubMavenPassword: System.getenv("MAVEN_PASSWORD")
         }
     }
 }
