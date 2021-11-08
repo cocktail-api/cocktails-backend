@@ -1,7 +1,7 @@
 version: '3.3'
 services:
   postgres:
-    image: postgres:12.2-alpine
+    image: postgres:13.3-alpine
     environment:
       POSTGRES_PASSWORD: verysecure
       POSTGRES_USER: dev

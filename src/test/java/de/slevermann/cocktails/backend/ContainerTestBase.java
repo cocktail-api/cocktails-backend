@@ -17,7 +17,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
 @ContextConfiguration(initializers = ContainerTestBase.Initializer.class)
 public abstract class ContainerTestBase {
 
-    public static final PostgreSQLContainer postgres = new PostgreSQLContainer("postgres:12.2-alpine");
+    public static final PostgreSQLContainer postgres = new PostgreSQLContainer("postgres:13.3-alpine");
 
     static {
         if (System.getenv("NO_DOCKER") == null) {
