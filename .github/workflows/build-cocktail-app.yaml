@@ -33,10 +33,10 @@ jobs:
       - name: Build application
         run: ./gradlew -Pci classes testClasses
         env:
-          MAVEN_USERNAME: ${{ env.GITHUB_ACTOR }}
-          MAVEN_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+          MAVEN_USERNAME: ${{ github.actor }}
+          MAVEN_PASSWORD: ${{ github.token }}
       - name: Test application
         run: ./gradlew -Pci test
         env:
-          MAVEN_USERNAME: ${{ env.GITHUB_ACTOR }}
-          MAVEN_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+          MAVEN_USERNAME: ${{ github.actor }}
+          MAVEN_PASSWORD: ${{ github.token }}
