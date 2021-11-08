@@ -1,4 +1,4 @@
-# Database configuration to run tests without docker
+# Database configuration to run tests without docker in CI
 spring:
   datasource:
     url: jdbc:postgresql://localhost:54321/cocktails

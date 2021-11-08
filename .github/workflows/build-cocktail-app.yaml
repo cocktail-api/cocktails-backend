@@ -1,0 +1,32 @@
+on:
+  - push
+  - pull_request
+
+jobs:
+  build-and-test:
+    env:
+      MAVEN_USERNAME: ${{ env.GITHUB_ACTOR }}
+      MAVEN_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    services:
+      postgres:
+        image: postgres:13.3-alpine
+        env:
+          POSTGRES_PASSWORD: verysecure
+          POSTGRES_USER: dev
+          POSTGRES_DB: cocktails
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-java@v2
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+      - name: Validate Gradle wrapper
+        uses: gradle/wrapper-validation-action@v1
+      - name: Build application
+        run: ./gradlew -Pci assemble
+      - name: Test application
+        run: ./gradlew -Pci test

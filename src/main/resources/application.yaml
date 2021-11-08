@@ -1,8 +1,3 @@
-logging:
-  level:
-    org:
-      jdbi:
-        sql: DEBUG
 management:
   server:
     port: 8091

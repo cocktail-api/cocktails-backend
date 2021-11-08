@@ -73,6 +73,12 @@ test {
         environment 'NO_DOCKER', 'true'
         environment 'SPRING_PROFILES_ACTIVE', 'nodocker'
     }
+
+    if (project.hasProperty('ci')) {
+        environment 'NO_DOCKER', 'true'
+        environment 'SPRING_PROFILES_ACTIVE', 'ci'
+    }
+
     useJUnitPlatform()
 }
 
