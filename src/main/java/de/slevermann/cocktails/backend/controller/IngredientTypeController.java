@@ -1,6 +1,6 @@
 package de.slevermann.cocktails.backend.controller;
 
-import de.slevermann.cocktails.backend.model.db.DbIngredientType;
+import de.slevermann.cocktails.api.model.IngredientType;
 import de.slevermann.cocktails.backend.service.IngredientTypeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -22,8 +22,8 @@ public class IngredientTypeController {
     private final IngredientTypeService typeService;
 
     @GetMapping
-    public List<DbIngredientType> getAll(@RequestParam(name = "page", defaultValue = "1") @Min(1) final int page,
-                                         @RequestParam(name = "pageSize", defaultValue = "10") @Min(1) @Max(50) final int pageSize) {
+    public List<IngredientType> getAll(@RequestParam(name = "page", defaultValue = "1") @Min(1) final int page,
+                                       @RequestParam(name = "pageSize", defaultValue = "10") @Min(1) @Max(50) final int pageSize) {
         return typeService.types(page, pageSize);
     }
 

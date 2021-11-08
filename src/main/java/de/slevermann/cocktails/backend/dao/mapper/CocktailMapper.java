@@ -8,7 +8,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
 
-@Mapper
+@JdbiRowMapper
 public class CocktailMapper implements RowMapper<DbCocktail> {
 
     @Override

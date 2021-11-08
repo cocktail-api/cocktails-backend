@@ -1,6 +1,6 @@
 package de.slevermann.cocktails.backend.controller;
 
-import de.slevermann.cocktails.backend.model.db.DbIngredient;
+import de.slevermann.cocktails.api.model.Ingredient;
 import de.slevermann.cocktails.backend.service.IngredientService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -22,8 +22,8 @@ public class IngredientController {
     private final IngredientService ingredientService;
 
     @GetMapping
-    public List<DbIngredient> getAll(@RequestParam(name = "page", defaultValue = "1") @Min(1) final int page,
-                                     @RequestParam(name = "pageSize", defaultValue = "10") @Min(1) @Max(50) final int pageSize) {
+    public List<Ingredient> getAll(@RequestParam(name = "page", defaultValue = "1") @Min(1) final int page,
+                                   @RequestParam(name = "pageSize", defaultValue = "10") @Min(1) @Max(50) final int pageSize) {
         return ingredientService.ingredients(page, pageSize);
     }
 

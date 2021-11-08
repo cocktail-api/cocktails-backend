@@ -1,9 +1,11 @@
 package de.slevermann.cocktails.backend.service;
 
+import de.slevermann.cocktails.api.model.Cocktail;
+import de.slevermann.cocktails.api.model.CocktailListEntry;
 import de.slevermann.cocktails.backend.dao.CocktailDao;
 import de.slevermann.cocktails.backend.dao.IngredientDao;
-import de.slevermann.cocktails.backend.model.Cocktail;
 import de.slevermann.cocktails.backend.model.db.DbCocktail;
+import de.slevermann.cocktails.backend.model.mapper.CocktailMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -21,8 +23,11 @@ public class CocktailService {
 
     private final IngredientDao ingredientDao;
 
-    public List<DbCocktail> cocktails(final int page, final int pageSize) {
-        return cocktailDao.getAll((page - 1) * pageSize, pageSize);
+    private final CocktailMapper cocktailMapper;
+
+    public List<CocktailListEntry> cocktails(final int page, final int pageSize) {
+        return cocktailDao.getAll((page - 1) * pageSize, pageSize)
+                .stream().map(cocktailMapper::fromDb).toList();
     }
 
     @Transactional
@@ -35,7 +40,7 @@ public class CocktailService {
 
         final var ingredients = ingredientDao.findByCocktail(fromDb.id());
 
-        return new Cocktail(fromDb, ingredients);
+        return cocktailMapper.fromDb(fromDb, ingredients);
     }
 
     public long count() {

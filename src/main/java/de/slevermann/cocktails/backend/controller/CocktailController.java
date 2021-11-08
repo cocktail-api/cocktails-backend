@@ -1,6 +1,7 @@
 package de.slevermann.cocktails.backend.controller;
 
-import de.slevermann.cocktails.backend.model.Cocktail;
+import de.slevermann.cocktails.api.model.Cocktail;
+import de.slevermann.cocktails.api.model.CocktailListEntry;
 import de.slevermann.cocktails.backend.model.db.DbCocktail;
 import de.slevermann.cocktails.backend.service.CocktailService;
 import lombok.RequiredArgsConstructor;
@@ -26,8 +27,8 @@ public class CocktailController {
     private final CocktailService cocktailService;
 
     @GetMapping
-    public List<DbCocktail> getAll(@RequestParam(name = "page", defaultValue = "1") @Min(1) final int page,
-                                   @RequestParam(name = "pageSize", defaultValue = "10") @Min(1) @Max(50) final int pageSize) {
+    public List<CocktailListEntry> getAll(@RequestParam(name = "page", defaultValue = "1") @Min(1) final int page,
+                                          @RequestParam(name = "pageSize", defaultValue = "10") @Min(1) @Max(50) final int pageSize) {
         return cocktailService.cocktails(page, pageSize);
     }
 
