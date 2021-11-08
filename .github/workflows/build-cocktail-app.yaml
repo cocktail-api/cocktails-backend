@@ -4,9 +4,6 @@ on:
 
 jobs:
   build-and-test:
-    env:
-      MAVEN_USERNAME: ${{ env.GITHUB_ACTOR }}
-      MAVEN_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -28,5 +25,12 @@ jobs:
         uses: gradle/wrapper-validation-action@v1
       - name: Build application
         run: ./gradlew -Pci assemble
+        env:
+          MAVEN_USERNAME: ${{ env.GITHUB_ACTOR }}
+          MAVEN_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
       - name: Test application
         run: ./gradlew -Pci test
+        env:
+          MAVEN_USERNAME: ${{ env.GITHUB_ACTOR }}
+          MAVEN_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+
