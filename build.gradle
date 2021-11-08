@@ -16,7 +16,18 @@ configurations {
 
 repositories {
     mavenCentral()
-    mavenLocal()
+    maven {
+        name = "Github"
+        url = "https://maven.pkg.github.com/cocktail-api/cocktails-api"
+        // GitHub Maven registry does not support anonymous fetching.
+        // Generate a PAT with scope read:packages and set the following properties in ~/.gradle/gradle.properties
+        // githubMavenUser=yourGithubUserName
+        // githubMavenPassword=yourGeneratedPAT
+        credentials {
+            username = githubMavenUser ?: System.getenv("MAVEN_USERNAME")
+            password = githubMavenPassword ?: System.getenv("MAVEN_PASSWORD")
+        }
+    }
 }
 
 dependencies {
