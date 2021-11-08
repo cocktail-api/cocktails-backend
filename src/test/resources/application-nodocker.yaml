@@ -1,0 +1,6 @@
+# Database configuration to run tests without docker
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:54321/cocktails
+    username: dev
+    password: verysecures
