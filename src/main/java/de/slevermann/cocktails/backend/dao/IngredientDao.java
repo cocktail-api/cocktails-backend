@@ -23,4 +23,10 @@ public interface IngredientDao {
             description = "Performance of ingredient fetching by cocktail",
             percentiles = {0.99, 0.95, 0.9, 0.5})
     List<DbIngredient> findByCocktail(@Bind("uuid") final UUID uuid);
+
+    @SqlQuery
+    @Timed(value = "ingredients.count",
+            description = "Performance of ingredient counting",
+            percentiles = {0.99, 0.95, 0.9, 0.5})
+    long count();
 }

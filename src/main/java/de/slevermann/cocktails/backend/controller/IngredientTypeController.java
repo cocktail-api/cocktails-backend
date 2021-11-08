@@ -27,4 +27,8 @@ public class IngredientTypeController {
         return typeService.types(page, pageSize);
     }
 
+    @GetMapping("/count")
+    public long count() {
+        return typeService.count();
+    }
 }

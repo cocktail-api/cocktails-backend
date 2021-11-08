@@ -37,4 +37,8 @@ public class CocktailService {
 
         return new Cocktail(fromDb, ingredients);
     }
+
+    public long count() {
+        return cocktailDao.count();
+    }
 }

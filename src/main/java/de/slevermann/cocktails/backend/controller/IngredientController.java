@@ -27,4 +27,9 @@ public class IngredientController {
         return ingredientService.ingredients(page, pageSize);
     }
 
+    @GetMapping("/count")
+    public long count() {
+        return ingredientService.count();
+    }
+
 }

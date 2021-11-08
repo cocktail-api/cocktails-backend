@@ -18,4 +18,7 @@ public class IngredientService {
         return ingredientDao.getAll((page - 1) * pageSize, pageSize);
     }
 
+    public long count() {
+        return ingredientDao.count();
+    }
 }

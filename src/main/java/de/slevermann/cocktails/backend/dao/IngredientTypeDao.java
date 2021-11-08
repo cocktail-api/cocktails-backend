@@ -17,4 +17,9 @@ public interface IngredientTypeDao {
             percentiles = {0.99, 0.95, 0.9, 0.5})
     List<DbIngredientType> getAll(@Bind("offset") final int offset, @Bind("pageSize") final int pageSize);
 
+    @SqlQuery
+    @Timed(value = "types.count",
+            description = "Performance of ingredient type counting",
+            percentiles = {0.99, 0.95, 0.9, 0.5})
+    long count();
 }

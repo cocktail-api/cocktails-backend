@@ -24,4 +24,10 @@ public interface CocktailDao {
             percentiles = {0.99, 0.95, 0.9, 0.5})
     DbCocktail findById(@Bind("uuid") final UUID uuid);
 
+    @SqlQuery
+    @Timed(value = "cocktails.count",
+            description = "Performance of cocktail counting",
+            percentiles = {0.99, 0.95, 0.9, 0.5})
+    long count();
+
 }

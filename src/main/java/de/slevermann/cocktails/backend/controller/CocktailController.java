@@ -35,4 +35,9 @@ public class CocktailController {
     public Cocktail getById(@PathVariable @Valid final UUID uuid) {
         return cocktailService.cocktail(uuid);
     }
+
+    @GetMapping("/count")
+    public long count() {
+        return cocktailService.count();
+    }
 }
