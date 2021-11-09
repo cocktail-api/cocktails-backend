@@ -42,7 +42,7 @@ jobs:
           MAVEN_PASSWORD: ${{ github.token }}
       - name: Push branch docker image
         if: ${{ github.event_name == 'push' }}
-        run: ./gradlew -Pci jib
+        run: ./gradlew -Pci jib -Djib.to.auth.username=${{ github.actor }} -Djib.to.auth.password=${{ github.token }}
         env:
           MAVEN_USERNAME: ${{ github.actor }}
           MAVEN_PASSWORD: ${{ github.token }}
