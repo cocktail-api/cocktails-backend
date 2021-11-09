@@ -1,4 +1,4 @@
-# Rename to application.yml and set a datasource for development here. Can be H2, MySQL or Postgres
+# Rename to application-dev.yml and set a datasource for development here.
 # The docker folder contains a compose-file that matches the example settings.
 spring:
   datasource:
