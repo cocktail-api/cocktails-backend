@@ -40,6 +40,9 @@ jobs:
         env:
           MAVEN_USERNAME: ${{ github.actor }}
           MAVEN_PASSWORD: ${{ github.token }}
-      - name: Push docker image
-        if: ${{ github.event_name != 'pull_request' }}
-        run: echo "Pretending to push docker image"
+      - name: Push branch docker image
+        if: ${{ github.event_name == 'push' }}
+        run: ./gradlew -Pci jib
+        env:
+          MAVEN_USERNAME: ${{ github.actor }}
+          MAVEN_PASSWORD: ${{ github.token }}
