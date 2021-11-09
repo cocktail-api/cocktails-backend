@@ -1,13 +1,6 @@
 on:
   push:
-    tags-ignore:
-      - '**'
-    branches:
-      - '**'
   pull_request:
-  release:
-    types:
-      - created
 
 jobs:
   build-and-test:
@@ -48,14 +41,18 @@ jobs:
           MAVEN_USERNAME: ${{ github.actor }}
           MAVEN_PASSWORD: ${{ github.token }}
       - name: Push branch docker image
-        if: ${{ github.event_name == 'push' }}
-        run: ./gradlew -Pci jib -Djib.to.auth.username=${{ github.actor }} -Djib.to.auth.password=${{ github.token }}
+        if: ${{ github.event_name == 'push' && !startsWith(github.ref, 'refs/tags/') }}
+        run: |
+          ./gradlew -Pci jib -Djib.to.auth.username=${{ github.actor }} -Djib.to.auth.password=${{ github.token }} \
+          -Djib.to.image="ghcr.io/cocktail-api/backend:latest-${GITHUB_REF##*/}"
         env:
           MAVEN_USERNAME: ${{ github.actor }}
           MAVEN_PASSWORD: ${{ github.token }}
-      - name: Push release docker image
-        if: ${{ github.event_name == 'release' }}
+      - name: Push tag docker image
+        if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') }}
         run: |
-          ./gradlew -Pci jib \
-            -Djib.to.auth.username=${{ github.actor }} -Djib.to.auth.password=${{ github.token }} \
-            -Djib.to.image="ghcr.io/cocktail-api/backend:${{ github.event.release.tag_name }}"
+          ./gradlew -Pci jib -Djib.to.auth.username=${{ github.actor }} -Djib.to.auth.password=${{ github.token }} \
+          -Djib.to.image="ghcr.io/cocktail-api/backend:${GITHUB_REF##*/}"
+        env:
+          MAVEN_USERNAME: ${{ github.actor }}
+          MAVEN_PASSWORD: ${{ github.token }}
