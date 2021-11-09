@@ -1,5 +1,6 @@
 package de.slevermann.cocktails.backend.dao;
 
+import de.slevermann.cocktails.backend.model.db.DbCocktailIngredient;
 import de.slevermann.cocktails.backend.model.db.DbIngredient;
 import io.micrometer.core.annotation.Timed;
 import org.jdbi.v3.sqlobject.customizer.Bind;
@@ -22,7 +23,7 @@ public interface IngredientDao {
     @Timed(value = "ingredients.findByCocktail",
             description = "Performance of ingredient fetching by cocktail",
             percentiles = {0.99, 0.95, 0.9, 0.5})
-    List<DbIngredient> findByCocktail(@Bind("uuid") final UUID uuid);
+    List<DbCocktailIngredient> findByCocktail(@Bind("uuid") final UUID uuid);
 
     @SqlQuery
     @Timed(value = "ingredients.count",

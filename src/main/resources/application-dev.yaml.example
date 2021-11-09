@@ -1,0 +1,14 @@
+# Rename to application.yml and set a datasource for development here. Can be H2, MySQL or Postgres
+# The docker folder contains a compose-file that matches the example settings.
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:54321/cocktails
+    username: dev
+    password: verysecure
+  jackson:
+    serialization:
+      INDENT_OUTPUT: true
+jdbi:
+  logging:
+    enabled: true
+    show-parameters: true

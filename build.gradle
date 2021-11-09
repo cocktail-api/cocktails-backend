@@ -15,6 +15,7 @@ configurations {
     }
 }
 
+
 repositories {
     mavenCentral()
     maven {
@@ -25,10 +26,14 @@ repositories {
         // githubMavenUser=yourGithubUserName
         // githubMavenPassword=yourGeneratedPAT
         credentials {
-            username = hasProperty("githubMavenUser") ? githubMavenUser : System.getenv("MAVEN_USERNAME")
-            password = hasProperty("githubMavenPassword") ? githubMavenPassword: System.getenv("MAVEN_PASSWORD")
+            username = project.hasProperty("githubMavenUser") ? project.property("githubMavenUser") : System.getenv("MAVEN_USERNAME")
+            password = project.hasProperty("githubMavenPassword") ? project.property("githubMavenPassword") : System.getenv("MAVEN_PASSWORD")
         }
     }
+}
+
+configurations.all {
+    resolutionStrategy.cacheDynamicVersionsFor 1, 'seconds'
 }
 
 dependencies {

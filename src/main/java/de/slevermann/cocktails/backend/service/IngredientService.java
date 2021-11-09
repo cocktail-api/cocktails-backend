@@ -2,7 +2,6 @@ package de.slevermann.cocktails.backend.service;
 
 import de.slevermann.cocktails.api.model.Ingredient;
 import de.slevermann.cocktails.backend.dao.IngredientDao;
-import de.slevermann.cocktails.backend.model.db.DbIngredient;
 import de.slevermann.cocktails.backend.model.mapper.IngredientMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
