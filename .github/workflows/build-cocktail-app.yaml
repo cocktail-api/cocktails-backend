@@ -1,6 +1,9 @@
 on:
-  - push
-  - pull_request
+  push:
+  pull_request:
+  release:
+    types:
+      - created
 
 jobs:
   build-and-test:
@@ -46,3 +49,9 @@ jobs:
         env:
           MAVEN_USERNAME: ${{ github.actor }}
           MAVEN_PASSWORD: ${{ github.token }}
+      - name: Push release docker image
+        if: ${{ github.event_name == 'release' }}
+        run: |
+          ./gradlew -Pci jib \
+            -Djib.to.auth.username=${{ github.actor }} -Djib.to.auth.password=${{ github.token }} \
+            -Djib.to.image="ghcr.io/cocktail-api/backend:${{ github.event.release.tag_name }}"
