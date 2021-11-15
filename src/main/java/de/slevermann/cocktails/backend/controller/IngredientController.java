@@ -1,14 +1,18 @@
 package de.slevermann.cocktails.backend.controller;
 
+import de.slevermann.cocktails.api.model.CreateIngredient;
 import de.slevermann.cocktails.api.model.Ingredient;
 import de.slevermann.cocktails.backend.service.IngredientService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import java.util.List;
@@ -30,6 +34,11 @@ public class IngredientController {
     @GetMapping("/count")
     public long count() {
         return ingredientService.count();
+    }
+
+    @PostMapping
+    public Ingredient create(@RequestBody @Valid CreateIngredient createIngredient) {
+        return ingredientService.create(createIngredient);
     }
 
 }

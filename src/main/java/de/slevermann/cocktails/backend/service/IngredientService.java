@@ -1,5 +1,6 @@
 package de.slevermann.cocktails.backend.service;
 
+import de.slevermann.cocktails.api.model.CreateIngredient;
 import de.slevermann.cocktails.api.model.Ingredient;
 import de.slevermann.cocktails.backend.dao.IngredientDao;
 import de.slevermann.cocktails.backend.model.mapper.IngredientMapper;
@@ -24,5 +25,10 @@ public class IngredientService {
 
     public long count() {
         return ingredientDao.count();
+    }
+
+    public Ingredient create(final CreateIngredient createIngredient) {
+        return ingredientMapper.fromDb(
+                ingredientDao.create(ingredientMapper.fromApi(createIngredient)));
     }
 }

@@ -1,3 +1,5 @@
+import java.util.concurrent.TimeUnit
+
 plugins {
     id 'org.springframework.boot' version '2.5.6'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
@@ -33,7 +35,8 @@ repositories {
 }
 
 configurations.all {
-    resolutionStrategy.cacheDynamicVersionsFor 1, 'seconds'
+    resolutionStrategy.cacheDynamicVersionsFor 1, TimeUnit.SECONDS
+    resolutionStrategy.cacheChangingModulesFor 1, TimeUnit.SECONDS
 }
 
 dependencies {
