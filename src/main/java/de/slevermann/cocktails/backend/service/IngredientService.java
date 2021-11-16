@@ -40,4 +40,12 @@ public class IngredientService {
             throw new NoSuchResourceProblem(ResourceType.INGREDIENT, uuid.toString());
         }
     }
+
+    public Ingredient get(final UUID uuid) {
+        final var ingredient = ingredientDao.getById(uuid);
+        if (ingredient == null) {
+            throw new NoSuchResourceProblem(ResourceType.INGREDIENT, uuid.toString());
+        }
+        return ingredientMapper.fromDb(ingredient);
+    }
 }

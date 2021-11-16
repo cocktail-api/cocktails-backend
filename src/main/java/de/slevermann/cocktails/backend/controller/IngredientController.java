@@ -45,7 +45,12 @@ public class IngredientController {
     }
 
     @DeleteMapping("/{uuid}")
-    public void delete(@PathVariable @Valid UUID uuid) {
+    public void delete(@PathVariable final UUID uuid) {
         ingredientService.delete(uuid);
+    }
+
+    @GetMapping("/{uuid}")
+    public Ingredient getById(@PathVariable final UUID uuid) {
+        return ingredientService.get(uuid);
     }
 }

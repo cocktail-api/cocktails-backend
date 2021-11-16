@@ -48,4 +48,11 @@ public interface IngredientDao {
             description = "Performance of ingredient creation",
             percentiles = {0.99, 0.95, 0.9, 0.5})
     int delete(@Bind("uuid") final UUID uuid);
+
+    @SqlQuery
+    @Timed(value = "ingredients.get",
+            description = "Performance of ingredient fetching",
+            percentiles = {0.99, 0.95, 0.9, 0.5})
+    DbIngredient getById(@Bind("uuid") final UUID uuid);
+
 }
