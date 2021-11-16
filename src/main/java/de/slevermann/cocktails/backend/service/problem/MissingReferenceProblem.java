@@ -3,14 +3,14 @@ package de.slevermann.cocktails.backend.service.problem;
 import org.zalando.problem.AbstractThrowableProblem;
 import org.zalando.problem.Status;
 
-public class BadReferenceProblem extends AbstractThrowableProblem {
+public class MissingReferenceProblem extends AbstractThrowableProblem {
 
     private final ResourceType referencedResourceType;
 
     private final String resourceId;
 
-    public BadReferenceProblem(final ResourceType referencedResourceType,
-                               final String resourceId) {
+    public MissingReferenceProblem(final ResourceType referencedResourceType,
+                                   final String resourceId) {
         super(null,
                 "Referenced entity does not exist",
                 Status.UNPROCESSABLE_ENTITY,

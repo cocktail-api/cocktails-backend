@@ -55,4 +55,15 @@ public interface IngredientDao {
             percentiles = {0.99, 0.95, 0.9, 0.5})
     DbIngredient getById(@Bind("uuid") final UUID uuid);
 
+    @SqlQuery
+    @Timed(value = "ingredients.usedByCocktailsCount",
+            description = "Performance of counting cocktails an ingredient is used by",
+            percentiles = {0.99, 0.95, 0.9, 0.5})
+    long usedByCount(@Bind("uuid") final UUID uuid);
+
+    @SqlQuery
+    @Timed(value = "ingredients.shelfCount",
+            description = "Performance of counting users that have the ingredient",
+            percentiles = {0.99, 0.95, 0.9, 0.5})
+    long shelfCount(@Bind("uuid") final UUID uuid);
 }

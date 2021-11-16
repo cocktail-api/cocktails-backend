@@ -6,6 +6,8 @@ import de.slevermann.cocktails.backend.dao.CocktailDao;
 import de.slevermann.cocktails.backend.dao.IngredientDao;
 import de.slevermann.cocktails.backend.model.db.DbCocktail;
 import de.slevermann.cocktails.backend.model.mapper.CocktailMapper;
+import de.slevermann.cocktails.backend.service.problem.NoSuchResourceProblem;
+import de.slevermann.cocktails.backend.service.problem.ResourceType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -35,7 +37,7 @@ public class CocktailService {
         final var fromDb = cocktailDao.findById(uuid);
 
         if (fromDb == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+            throw new NoSuchResourceProblem(ResourceType.COCKTAIL, uuid.toString());
         }
 
         final var ingredients = ingredientDao.findByCocktail(fromDb.id());
