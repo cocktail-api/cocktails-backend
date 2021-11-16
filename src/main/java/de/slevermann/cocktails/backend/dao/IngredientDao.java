@@ -42,4 +42,10 @@ public interface IngredientDao {
             description = "Performance of ingredient creation",
             percentiles = {0.99, 0.95, 0.9, 0.5})
     DbIngredient create(@BindMethods final DbCreateIngredient ingredient);
+
+    @SqlUpdate
+    @Timed(value = "ingredients.delete",
+            description = "Performance of ingredient creation",
+            percentiles = {0.99, 0.95, 0.9, 0.5})
+    int delete(@Bind("uuid") final UUID uuid);
 }

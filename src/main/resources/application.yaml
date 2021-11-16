@@ -24,3 +24,13 @@ management:
       enabled: true
     db:
       enabled: true
+spring:
+  mvc:
+    throw-exception-if-no-handler-found: true
+  web:
+    resources:
+      add-mappings: false
+server:
+  servlet:
+    encoding:
+      force: true

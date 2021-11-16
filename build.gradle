@@ -54,6 +54,7 @@ dependencies {
     implementation 'org.jdbi:jdbi3-postgres:3.23.0'
     implementation 'net.logstash.logback:logstash-logback-encoder:6.6'
     implementation 'org.mapstruct:mapstruct:1.4.2.Final'
+    implementation 'org.zalando:problem-spring-web:0.27.0'
 
     implementation 'de.slevermann.cocktails:cocktails-api:0.0.1-SNAPSHOT'
 

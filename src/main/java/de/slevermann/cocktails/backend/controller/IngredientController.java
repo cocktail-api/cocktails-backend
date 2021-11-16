@@ -5,7 +5,9 @@ import de.slevermann.cocktails.api.model.Ingredient;
 import de.slevermann.cocktails.backend.service.IngredientService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,6 +18,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import java.util.List;
+import java.util.UUID;
 
 @RequestMapping("/ingredients")
 @RequiredArgsConstructor
@@ -41,4 +44,8 @@ public class IngredientController {
         return ingredientService.create(createIngredient);
     }
 
+    @DeleteMapping("/{uuid}")
+    public void delete(@PathVariable @Valid UUID uuid) {
+        ingredientService.delete(uuid);
+    }
 }
