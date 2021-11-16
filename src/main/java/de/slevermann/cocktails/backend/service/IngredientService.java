@@ -3,11 +3,14 @@ package de.slevermann.cocktails.backend.service;
 import de.slevermann.cocktails.api.model.CreateIngredient;
 import de.slevermann.cocktails.api.model.Ingredient;
 import de.slevermann.cocktails.backend.dao.IngredientDao;
+import de.slevermann.cocktails.backend.dao.IngredientTypeDao;
 import de.slevermann.cocktails.backend.model.mapper.IngredientMapper;
+import de.slevermann.cocktails.backend.service.problem.BadReferenceProblem;
 import de.slevermann.cocktails.backend.service.problem.NoSuchResourceProblem;
 import de.slevermann.cocktails.backend.service.problem.ResourceType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -18,6 +21,8 @@ import java.util.UUID;
 public class IngredientService {
 
     private final IngredientDao ingredientDao;
+
+    private final IngredientTypeDao ingredientTypeDao;
 
     private final IngredientMapper ingredientMapper;
 
@@ -30,7 +35,13 @@ public class IngredientService {
         return ingredientDao.count();
     }
 
+    @Transactional
     public Ingredient create(final CreateIngredient createIngredient) {
+        final var typeId = createIngredient.getType();
+        final var type = ingredientTypeDao.getById(typeId);
+        if (type == null) {
+            throw new BadReferenceProblem(ResourceType.INGREDIENT_TYPE, typeId.toString());
+        }
         return ingredientMapper.fromDb(
                 ingredientDao.create(ingredientMapper.fromApi(createIngredient)));
     }
