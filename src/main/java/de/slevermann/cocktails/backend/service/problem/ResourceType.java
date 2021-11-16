@@ -1,5 +1,7 @@
 package de.slevermann.cocktails.backend.service.problem;
 
+import com.fasterxml.jackson.annotation.JsonValue;
+
 public enum ResourceType {
     COCKTAIL("Cocktail"),
     INGREDIENT("Ingredient"),
@@ -11,6 +13,7 @@ public enum ResourceType {
         this.type = type;
     }
 
+    @JsonValue
     public String getType() {
         return type;
     }

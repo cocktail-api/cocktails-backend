@@ -12,3 +12,6 @@ jdbi:
   logging:
     enabled: true
     show-parameters: true
+server:
+  error:
+    include-stacktrace: always

@@ -34,3 +34,5 @@ server:
   servlet:
     encoding:
       force: true
+  error:
+    include-stacktrace: never
