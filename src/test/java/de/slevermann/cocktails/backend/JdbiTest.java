@@ -1,6 +1,6 @@
 package de.slevermann.cocktails.backend;
 
-import de.slevermann.cocktails.backend.configuration.JdbiConfiguration;
+import de.slevermann.cocktails.backend.configuration.jdbi.JdbiConfiguration;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration;
@@ -24,7 +24,10 @@ import java.lang.annotation.Target;
 
 
 @BootstrapWith(SpringBootTestContextBootstrapper.class)
-@ComponentScan("de.slevermann.cocktails.backend.dao.mapper")
+@ComponentScan({
+        "de.slevermann.cocktails.backend.dao.mapper",
+        "de.slevermann.cocktails.backend.configuration.jdbi"
+})
 @ContextConfiguration(classes = JdbiConfiguration.class)
 @ExtendWith(SpringExtension.class)
 @ImportAutoConfiguration(classes = {

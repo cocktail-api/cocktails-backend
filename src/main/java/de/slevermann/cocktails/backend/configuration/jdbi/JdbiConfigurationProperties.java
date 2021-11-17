@@ -1,4 +1,4 @@
-package de.slevermann.cocktails.backend.configuration;
+package de.slevermann.cocktails.backend.configuration.jdbi;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

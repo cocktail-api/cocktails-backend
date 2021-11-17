@@ -1,4 +1,4 @@
-package de.slevermann.cocktails.backend.configuration;
+package de.slevermann.cocktails.backend.configuration.jdbi;
 
 import lombok.NonNull;
 import lombok.SneakyThrows;
@@ -10,6 +10,7 @@ import org.jdbi.v3.core.argument.internal.PojoPropertyArguments;
 import org.jdbi.v3.core.statement.Binding;
 import org.jdbi.v3.core.statement.SqlLogger;
 import org.jdbi.v3.core.statement.StatementContext;
+import org.springframework.stereotype.Component;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -24,6 +25,7 @@ import static net.logstash.logback.argument.StructuredArguments.kv;
  * arguments is probably noticeable even on a slow scale. Nice for debugging, though!
  */
 @Slf4j
+@Component
 public class JdbiLogger implements SqlLogger {
 
     private static final String ERROR_TEMPLATE_PARAMETERS = "Exception running query '{}' with parameters '{}'";

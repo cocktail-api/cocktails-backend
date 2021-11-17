@@ -1,4 +1,4 @@
-package de.slevermann.cocktails.backend.configuration;
+package de.slevermann.cocktails.backend.configuration.jdbi;
 
 import de.slevermann.cocktails.backend.dao.CocktailDao;
 import de.slevermann.cocktails.backend.dao.IngredientDao;
@@ -74,10 +74,5 @@ public class JdbiConfiguration {
     @Bean
     public CocktailDao cocktailDao(final Jdbi jdbi) {
         return jdbi.onDemand(CocktailDao.class);
-    }
-
-    @Bean
-    public JdbiLogger jdbiLogger(final JdbiConfigurationProperties configurationProperties) {
-        return new JdbiLogger(configurationProperties);
     }
 }
