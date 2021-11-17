@@ -5,15 +5,27 @@ plugins {
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'com.google.cloud.tools.jib' version '3.1.4'
     id 'java'
+    id 'jacoco'
 }
 
 group = 'de.slevermann.cocktails'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '17'
 
 configurations {
     compileOnly {
         extendsFrom annotationProcessor
+    }
+}
+
+jacoco {
+    toolVersion = '0.8.7'
+}
+
+jacocoTestReport {
+    reports {
+        xml.required = true
+        html.required = false
+        csv.required = false
     }
 }
 
@@ -90,6 +102,8 @@ test {
     }
 
     useJUnitPlatform()
+
+    finalizedBy jacocoTestReport
 }
 
 bootRun {
@@ -102,6 +116,7 @@ compileJava {
             '-Amapstruct.defaultComponentModel=spring',
             '-Amapstruct.defaultInjectionStrategy=constructor'
     ]
+    options.compilerArgs.addAll(['--release', '17'])
 }
 
 jib {
