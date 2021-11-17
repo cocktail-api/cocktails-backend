@@ -13,7 +13,7 @@ public class ReferencedEntityProblem extends AbstractThrowableProblem {
                                    final String resourceId) {
         super(null,
                 "Entity is referenced by other resource",
-                Status.BAD_REQUEST,
+                Status.UNPROCESSABLE_ENTITY,
                 String.format("The resource %s with ID %s cannot be deleted because" +
                         " it is in use by another entity", resourceType.getType(), resourceId));
         this.resourceId = resourceId;

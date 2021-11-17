@@ -40,8 +40,14 @@ public interface IngredientTypeDao {
     DbIngredientType create(@Bind("name") final String name);
 
     @SqlUpdate
-    @Timed(value = "types.create",
+    @Timed(value = "types.delete",
             description = "Performance of ingredient type deletion",
             percentiles = {0.99, 0.95, 0.9, 0.5})
     int delete(@Bind("uuid") final UUID uuid);
+
+    @SqlQuery
+    @Timed(value = "types.usedByCount",
+            description = "Performance of ingredient type use count",
+            percentiles = {0.99, 0.95, 0.9, 0.5})
+    long usedByCount(@Bind("uuid") final UUID uuid);
 }

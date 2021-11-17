@@ -4,6 +4,7 @@ import de.slevermann.cocktails.api.model.CreateIngredient;
 import de.slevermann.cocktails.api.model.Ingredient;
 import de.slevermann.cocktails.backend.service.IngredientService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -45,8 +46,9 @@ public class IngredientController {
     }
 
     @DeleteMapping("/{uuid}")
-    public void delete(@PathVariable final UUID uuid) {
+    public ResponseEntity<Void> delete(@PathVariable final UUID uuid) {
         ingredientService.delete(uuid);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{uuid}")

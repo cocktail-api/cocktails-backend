@@ -1,5 +1,6 @@
 package de.slevermann.cocktails.backend.dao;
 
+import de.slevermann.cocktails.backend.model.db.DbCreateIngredient;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -19,6 +20,9 @@ class IngredientTypeDaoTest extends DaoTestBase {
 
     @Autowired
     IngredientTypeDao ingredientTypeDao;
+
+    @Autowired
+    IngredientDao ingredientDao;
 
     UUID createdUuid;
 
@@ -84,5 +88,22 @@ class IngredientTypeDaoTest extends DaoTestBase {
     void testDeleteMissing() {
         assertEquals(0, ingredientTypeDao.delete(UUID.randomUUID()));
         assertEquals(1, ingredientTypeDao.count());
+    }
+
+    @Order(9)
+    @Test
+    void testUseCount() {
+        final var newType = ingredientTypeDao.create("new");
+
+        final var firstIngredient = new DbCreateIngredient(newType.id(),
+                "first", "description");
+        final var secondIngredient = new DbCreateIngredient(newType.id(),
+                "second", "description");
+
+        ingredientDao.create(firstIngredient);
+        ingredientDao.create(secondIngredient);
+
+        assertEquals(0, ingredientTypeDao.usedByCount(createdUuid));
+        assertEquals(2, ingredientTypeDao.usedByCount(newType.id()));
     }
 }
