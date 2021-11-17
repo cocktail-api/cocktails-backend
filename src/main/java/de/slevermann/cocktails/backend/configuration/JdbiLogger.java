@@ -10,7 +10,6 @@ import org.jdbi.v3.core.argument.internal.PojoPropertyArguments;
 import org.jdbi.v3.core.statement.Binding;
 import org.jdbi.v3.core.statement.SqlLogger;
 import org.jdbi.v3.core.statement.StatementContext;
-import org.springframework.stereotype.Component;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -24,7 +23,6 @@ import static net.logstash.logback.argument.StructuredArguments.kv;
  * This class is an unholy abomination that really should not exist. The performance drag of evaluating all the
  * arguments is probably noticeable even on a slow scale. Nice for debugging, though!
  */
-@Component
 @Slf4j
 public class JdbiLogger implements SqlLogger {
 

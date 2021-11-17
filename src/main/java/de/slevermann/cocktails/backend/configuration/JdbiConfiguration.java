@@ -75,4 +75,9 @@ public class JdbiConfiguration {
     public CocktailDao cocktailDao(final Jdbi jdbi) {
         return jdbi.onDemand(CocktailDao.class);
     }
+
+    @Bean
+    public JdbiLogger jdbiLogger(final JdbiConfigurationProperties configurationProperties) {
+        return new JdbiLogger(configurationProperties);
+    }
 }
