@@ -49,7 +49,7 @@ public class IngredientServiceTest {
     void testCount(final long count) {
         when(ingredientDao.count()).thenReturn(count);
 
-        assertEquals(count, ingredientService.count(), "Type count returning incorrect value");
+        assertEquals(count, ingredientService.count(), "Ingredient count returning incorrect value");
     }
 
     @Test
