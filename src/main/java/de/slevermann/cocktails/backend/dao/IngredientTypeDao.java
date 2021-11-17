@@ -4,7 +4,9 @@ import de.slevermann.cocktails.backend.model.db.DbIngredientType;
 import io.micrometer.core.annotation.Timed;
 import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.locator.UseClasspathSqlLocator;
+import org.jdbi.v3.sqlobject.statement.GetGeneratedKeys;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
+import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 
 import java.util.List;
 import java.util.UUID;
@@ -29,4 +31,17 @@ public interface IngredientTypeDao {
             description = "Performance of ingredient type counting",
             percentiles = {0.99, 0.95, 0.9, 0.5})
     DbIngredientType getById(@Bind("uuid") final UUID uuid);
+
+    @GetGeneratedKeys
+    @SqlUpdate
+    @Timed(value = "types.create",
+            description = "Performance of ingredient type creation",
+            percentiles = {0.99, 0.95, 0.9, 0.5})
+    DbIngredientType create(@Bind("name") final String name);
+
+    @SqlUpdate
+    @Timed(value = "types.create",
+            description = "Performance of ingredient type deletion",
+            percentiles = {0.99, 0.95, 0.9, 0.5})
+    int delete(@Bind("uuid") final UUID uuid);
 }
