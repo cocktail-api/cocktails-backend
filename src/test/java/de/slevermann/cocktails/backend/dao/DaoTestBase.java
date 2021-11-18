@@ -19,7 +19,7 @@ public abstract class DaoTestBase extends ContainerTestBase {
     @Autowired
     protected Jdbi jdbi;
 
-    private void truncate(Jdbi jdbi) {
+    private void truncate() {
         jdbi.useHandle(h -> {
             h.execute("TRUNCATE TABLE user_ingredient CASCADE");
             h.execute("TRUNCATE TABLE \"user\" CASCADE");
@@ -32,13 +32,13 @@ public abstract class DaoTestBase extends ContainerTestBase {
 
     @BeforeAll
     public final void beforeAll() {
-        truncate(jdbi);
+        truncate();
         customInit();
     }
 
     @AfterAll
     public final void afterAll() {
-        truncate(jdbi);
+        truncate();
         customTearDown();
     }
 

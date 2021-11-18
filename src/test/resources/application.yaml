@@ -1,0 +1,4 @@
+jdbi:
+  logging:
+    enabled: true
+    show-parameters: true

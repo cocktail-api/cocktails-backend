@@ -142,4 +142,23 @@ public class IngredientDaoTest extends DaoTestBase {
     @Disabled
     void testFindByCocktail() {
     }
+
+    @Order(12)
+    @Test
+    void testUpdate() {
+        final var replacement = new DbCreateIngredient(type.id(),
+                "newName", "newDescription");
+        final var newIngredient = ingredientDao.update(ingredient.id(), replacement);
+        assertEquals(newIngredient, ingredientDao.getById(ingredient.id()));
+        assertEquals("newName", newIngredient.name());
+        assertEquals("newDescription", newIngredient.description());
+    }
+
+    @Order(13)
+    @Test
+    void testUpdateMissing() {
+        final var replacement = new DbCreateIngredient(type.id(),
+                "newName", "newDescription");
+        assertNull(ingredientDao.update(UUID.randomUUID(), replacement));
+    }
 }

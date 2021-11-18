@@ -5,10 +5,8 @@ import de.slevermann.cocktails.backend.model.db.DbCreateIngredient;
 import de.slevermann.cocktails.backend.model.db.DbIngredient;
 import io.micrometer.core.annotation.Timed;
 import org.jdbi.v3.sqlobject.customizer.Bind;
-import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.customizer.BindMethods;
 import org.jdbi.v3.sqlobject.locator.UseClasspathSqlLocator;
-import org.jdbi.v3.sqlobject.statement.GetGeneratedKeys;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 
@@ -36,7 +34,6 @@ public interface IngredientDao {
             percentiles = {0.99, 0.95, 0.9, 0.5})
     long count();
 
-    @GetGeneratedKeys
     @SqlQuery
     @Timed(value = "ingredients.create",
             description = "Performance of ingredient creation",
@@ -66,4 +63,11 @@ public interface IngredientDao {
             description = "Performance of counting users that have the ingredient",
             percentiles = {0.99, 0.95, 0.9, 0.5})
     long shelfCount(@Bind("uuid") final UUID uuid);
+
+    @SqlQuery
+    @Timed(value = "ingredients.update",
+            description = "Performance of updating ingredients",
+            percentiles = {0.99, 0.95, 0.9, 0.5})
+    DbIngredient update(@Bind("uuid") final UUID uuid,
+                        @BindMethods final DbCreateIngredient ingredient);
 }

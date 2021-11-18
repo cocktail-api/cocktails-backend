@@ -78,44 +78,38 @@ public class JdbiLogger implements SqlLogger {
         field.setAccessible(true);
 
         @SuppressWarnings("unchecked") final var params = (Map<String, Object>) field.get(context.getBinding());
+        final var ret = new HashMap<Object, Object>(params);
+        // No named arguments available, try positionals:
+        field = bindingClass.getDeclaredField("positionals");
+        field.setAccessible(true);
 
-        if (params.isEmpty()) {
-            // No named arguments available, try positionals:
-            field = bindingClass.getDeclaredField("positionals");
-            field.setAccessible(true);
-
-            @SuppressWarnings("unchecked") final var positionalParams = (Map<Integer, Object>) field.get(context.getBinding());
-            if (positionalParams.isEmpty()) {
-                // No positional parameters either, try named argument finders
-                field = bindingClass.getDeclaredField("namedArgumentFinder");
-                field.setAccessible(true);
-                @SuppressWarnings("unchecked") final var finders = (List<NamedArgumentFinder>) field.get(context.getBinding());
-                final var boundProperties = new ArrayList<>();
-                for (final var finder : finders) {
-                    @SuppressWarnings("deprecation") final var mapArgs = finder instanceof MapArguments;
-                    if (finder instanceof PojoPropertyArguments || mapArgs) {
-                        final var args = new HashMap<String, Object>();
-                        for (final var name : finder.getNames()) {
-                            args.put(name, finder.find(name, context).orElse(null));
-                        }
-                        boundProperties.add(args);
-                    } else if (finder instanceof ObjectPropertyNamedArgumentFinder f) {
-                        final var objField = ObjectPropertyNamedArgumentFinder.class.getDeclaredField("obj");
-                        objField.setAccessible(true);
-                        final var obj = objField.get(f);
-                        final var prefixField = ObjectPropertyNamedArgumentFinder.class.getDeclaredField("prefix");
-                        prefixField.setAccessible(true);
-                        final var prefix = (String) prefixField.get(f);
-                        boundProperties.add(new PrefixedObject(obj, prefix));
-                    }
+        @SuppressWarnings("unchecked") final var positionalParams = (Map<Integer, Object>) field.get(context.getBinding());
+        ret.putAll(positionalParams);
+        // No positional parameters either, try named argument finders
+        field = bindingClass.getDeclaredField("namedArgumentFinder");
+        field.setAccessible(true);
+        @SuppressWarnings("unchecked") final var finders = (List<NamedArgumentFinder>) field.get(context.getBinding());
+        final var boundProperties = new ArrayList<>();
+        for (final var finder : finders) {
+            @SuppressWarnings("deprecation") final var mapArgs = finder instanceof MapArguments;
+            if (finder instanceof PojoPropertyArguments || mapArgs) {
+                final var args = new HashMap<String, Object>();
+                for (final var name : finder.getNames()) {
+                    args.put(name, finder.find(name, context).orElse(null));
                 }
-                return boundProperties;
-            } else {
-                return positionalParams;
+                boundProperties.add(args);
+            } else if (finder instanceof ObjectPropertyNamedArgumentFinder f) {
+                final var objField = ObjectPropertyNamedArgumentFinder.class.getDeclaredField("obj");
+                objField.setAccessible(true);
+                final var obj = objField.get(f);
+                final var prefixField = ObjectPropertyNamedArgumentFinder.class.getDeclaredField("prefix");
+                prefixField.setAccessible(true);
+                final var prefix = (String) prefixField.get(f);
+                boundProperties.add(new PrefixedObject(obj, prefix));
             }
-        } else {
-            return params;
         }
+        ret.put("boundProperties", boundProperties);
+        return ret;
     }
 
     private static record PrefixedObject(@NonNull Object obj, String prefix) {
