@@ -106,4 +106,16 @@ class IngredientTypeDaoTest extends DaoTestBase {
         assertEquals(0, ingredientTypeDao.usedByCount(createdUuid));
         assertEquals(2, ingredientTypeDao.usedByCount(newType.id()));
     }
+
+    @Order(10)
+    @Test
+    void testUpdate() {
+        final var type = ingredientTypeDao.create("newType");
+        assertEquals("newType", type.name());
+
+        final var updated = ingredientTypeDao.update(type.id(), "newName");
+        assertEquals("newName", updated.name());
+
+        assertEquals(updated, ingredientTypeDao.getById(type.id()));
+    }
 }

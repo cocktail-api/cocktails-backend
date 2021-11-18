@@ -50,4 +50,12 @@ public interface IngredientTypeDao {
             description = "Performance of ingredient type use count",
             percentiles = {0.99, 0.95, 0.9, 0.5})
     long usedByCount(@Bind("uuid") final UUID uuid);
+
+    @GetGeneratedKeys
+    @SqlUpdate
+    @Timed(value = "types.update",
+            description = "Performance of ingredient type update",
+            percentiles = {0.99, 0.95, 0.9, 0.5})
+    DbIngredientType update(@Bind("uuid") final UUID uuid, @Bind("name") final String name);
+
 }
