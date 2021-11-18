@@ -27,14 +27,18 @@ public interface UserDao {
     @Timed(value = "users.create",
             description = "Performance of user counting",
             percentiles = {0.99, 0.95, 0.9, 0.5})
-    DbUser create();
+    DbUser create(@Bind("nick") final String nick);
+
+    default DbUser create() {
+        return create(null);
+    }
 
     @GetGeneratedKeys
     @SqlUpdate
-    @Timed(value = "users.updateNick",
-            description = "Performance of user nick change",
+    @Timed(value = "users.update",
+            description = "Performance of user update",
             percentiles = {0.99, 0.95, 0.9, 0.5})
-    DbUser updateNick(@Bind("uuid") final UUID uuid, @Bind("nick") final String nick);
+    DbUser update(@Bind("uuid") final UUID uuid, @Bind("nick") final String nick);
 
     @SqlUpdate
     @Timed(value = "users.delete",

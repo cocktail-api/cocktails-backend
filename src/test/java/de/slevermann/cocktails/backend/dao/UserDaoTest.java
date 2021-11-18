@@ -39,7 +39,6 @@ public class UserDaoTest extends DaoTestBase {
 
     DbIngredient firstIngredient;
     DbIngredient secondIngredient;
-    DbIngredient thirdIngredient;
 
     @Order(1)
     @Test
@@ -58,7 +57,7 @@ public class UserDaoTest extends DaoTestBase {
     @Test
     void testSetNick() {
         assertNull(first.nick());
-        first = userDao.updateNick(first.id(), "hello");
+        first = userDao.update(first.id(), "hello");
         assertEquals("hello", first.nick());
     }
 
@@ -67,7 +66,7 @@ public class UserDaoTest extends DaoTestBase {
     void testCount() {
         assertEquals(1, userDao.count());
         second = userDao.create();
-        second = userDao.updateNick(second.id(), "world");
+        second = userDao.update(second.id(), "world");
         assertEquals(2, userDao.count());
     }
 
@@ -153,4 +152,11 @@ public class UserDaoTest extends DaoTestBase {
         assertEquals(1, userDao.getShelf(first.id()).size());
     }
 
+    @Order(15)
+    @Test
+    void createWithNick() {
+        final var created = userDao.create("newguy");
+        assertEquals("newguy", created.nick());
+        assertEquals(created, userDao.getByNick("newguy"));
+    }
 }
