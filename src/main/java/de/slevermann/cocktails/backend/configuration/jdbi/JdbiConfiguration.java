@@ -3,6 +3,7 @@ package de.slevermann.cocktails.backend.configuration.jdbi;
 import de.slevermann.cocktails.backend.dao.CocktailDao;
 import de.slevermann.cocktails.backend.dao.IngredientDao;
 import de.slevermann.cocktails.backend.dao.IngredientTypeDao;
+import de.slevermann.cocktails.backend.dao.UserDao;
 import de.slevermann.cocktails.backend.model.db.DbUnit;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.enums.EnumStrategy;
@@ -74,5 +75,10 @@ public class JdbiConfiguration {
     @Bean
     public CocktailDao cocktailDao(final Jdbi jdbi) {
         return jdbi.onDemand(CocktailDao.class);
+    }
+
+    @Bean
+    public UserDao userDao(final Jdbi jdbi) {
+        return jdbi.onDemand(UserDao.class);
     }
 }
