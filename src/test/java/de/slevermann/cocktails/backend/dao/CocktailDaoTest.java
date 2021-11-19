@@ -6,7 +6,6 @@ import de.slevermann.cocktails.backend.model.db.DbCreateCocktail;
 import de.slevermann.cocktails.backend.model.db.DbCreateIngredient;
 import de.slevermann.cocktails.backend.model.db.DbIngredient;
 import de.slevermann.cocktails.backend.model.db.DbIngredientType;
-import de.slevermann.cocktails.backend.model.db.DbUnit;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +13,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.Set;
 import java.util.UUID;
 
+import static de.slevermann.cocktails.backend.model.db.DbUnit.grams;
+import static de.slevermann.cocktails.backend.model.db.DbUnit.milliliters;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -126,8 +128,8 @@ public class CocktailDaoTest extends DaoTestBase {
         firstCocktail = cocktailDao.create(new DbCreateCocktail("cocktail", "description"));
 
         cocktailDao.addIngredients(firstCocktail.id(), Set.of(
-                new DbCocktailIngredient(firstIngredient, 1.0d, DbUnit.grams, false, false),
-                new DbCocktailIngredient(secondIngredient, 20d, DbUnit.milliliters, false, false)
+                new DbCocktailIngredient(firstIngredient, 1.0d, grams, false, false),
+                new DbCocktailIngredient(secondIngredient, 20d, milliliters, false, false)
         ));
 
         final var ingredients = cocktailDao.getIngredients(firstCocktail.id());
@@ -142,7 +144,7 @@ public class CocktailDaoTest extends DaoTestBase {
     @Test
     void testAddSingleIngredient() {
         cocktailDao.addIngredient(secondCocktail.id(),
-                new DbCocktailIngredient(secondIngredient, 20d, DbUnit.milliliters, false, false));
+                new DbCocktailIngredient(secondIngredient, 20d, milliliters, false, false));
 
         final var ingredients = cocktailDao.getIngredients(secondCocktail.id());
         assertEquals(1, ingredients.size());
@@ -153,7 +155,7 @@ public class CocktailDaoTest extends DaoTestBase {
     @Test
     void testRemoveIngredients() {
         cocktailDao.addIngredient(firstCocktail.id(),
-                new DbCocktailIngredient(thirdIngredient, 20d, DbUnit.milliliters, false, false));
+                new DbCocktailIngredient(thirdIngredient, 20d, milliliters, false, false));
 
         cocktailDao.removeIngredients(firstCocktail.id(), Set.of(firstIngredient.id(), secondIngredient.id()));
 
@@ -169,4 +171,26 @@ public class CocktailDaoTest extends DaoTestBase {
         assertEquals(0, cocktailDao.getIngredients(secondCocktail.id()).size());
     }
 
+    @Order(70)
+    @Test
+    void testAddExistingIngredient() {
+        var ingredients = cocktailDao.getIngredients(firstCocktail.id());
+        assertEquals(1, ingredients.size());
+        assertEquals(thirdIngredient.id(), ingredients.get(0).id());
+        assertEquals(20d, ingredients.get(0).amount());
+        assertEquals(milliliters, ingredients.get(0).unit());
+        assertFalse(ingredients.get(0).garnish());
+        assertFalse(ingredients.get(0).optional());
+
+        cocktailDao.addIngredient(firstCocktail.id(),
+                new DbCocktailIngredient(thirdIngredient, 40d, grams, true, true));
+
+        ingredients = cocktailDao.getIngredients(firstCocktail.id());
+        assertEquals(1, ingredients.size());
+        assertEquals(thirdIngredient.id(), ingredients.get(0).id());
+        assertEquals(40d, ingredients.get(0).amount());
+        assertEquals(grams, ingredients.get(0).unit());
+        assertTrue(ingredients.get(0).garnish());
+        assertTrue(ingredients.get(0).optional());
+    }
 }
