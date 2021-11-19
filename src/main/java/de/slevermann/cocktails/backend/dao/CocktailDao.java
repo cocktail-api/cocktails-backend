@@ -3,10 +3,13 @@ package de.slevermann.cocktails.backend.dao;
 import de.slevermann.cocktails.backend.model.db.DbCocktail;
 import de.slevermann.cocktails.backend.model.db.DbCocktailIngredient;
 import de.slevermann.cocktails.backend.model.db.DbCreateCocktail;
+import de.slevermann.cocktails.backend.model.db.DbCreateCocktailIngredient;
+import de.slevermann.cocktails.backend.model.db.DbCreateInstruction;
 import de.slevermann.cocktails.backend.model.db.DbInstruction;
 import io.micrometer.core.annotation.Timed;
 import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.customizer.BindMethods;
+import org.jdbi.v3.sqlobject.customizer.Timestamped;
 import org.jdbi.v3.sqlobject.locator.UseClasspathSqlLocator;
 import org.jdbi.v3.sqlobject.statement.GetGeneratedKeys;
 import org.jdbi.v3.sqlobject.statement.SqlBatch;
@@ -56,6 +59,7 @@ public interface CocktailDao {
     @Timed(value = "cocktails.update",
             description = "Performance of cocktail update",
             percentiles = {0.99, 0.95, 0.9, 0.5})
+    @Timestamped
     DbCocktail update(@Bind("uuid") final UUID uuid, @BindMethods final DbCreateCocktail cocktail);
 
 
@@ -69,9 +73,10 @@ public interface CocktailDao {
     @Timed(value = "cocktails.addIngredients",
             description = "Performance of cocktail ingredient adding",
             percentiles = {0.99, 0.95, 0.9, 0.5})
-    void addIngredients(@Bind("cocktail") final UUID cocktail, @BindMethods final Set<DbCocktailIngredient> ingredients);
+    @Timestamped
+    void addIngredients(@Bind("cocktail") final UUID cocktail, @BindMethods final Set<DbCreateCocktailIngredient> ingredients);
 
-    default void addIngredient(final UUID cocktail, final DbCocktailIngredient ingredient) {
+    default void addIngredient(final UUID cocktail, final DbCreateCocktailIngredient ingredient) {
         addIngredients(cocktail, Set.of(ingredient));
     }
 
@@ -90,7 +95,8 @@ public interface CocktailDao {
     @Timed(value = "cocktails.addInstructions",
             description = "Performance of cocktail instruction creation",
             percentiles = {0.99, 0.95, 0.9, 0.5})
-    Set<DbInstruction> addInstructions(@Bind("cocktail") final UUID cocktail, @BindMethods final Set<DbInstruction> instructions);
+    @Timestamped
+    Set<DbInstruction> addInstructions(@Bind("cocktail") final UUID cocktail, @BindMethods final Set<DbCreateInstruction> instructions);
 
     @SqlQuery
     @Timed(value = "cocktails.getInstructions",

@@ -7,4 +7,5 @@ where c.uuid = :cocktail
 on conflict on constraint cocktail_ingredient_pkey do update set optional = :optional,
                                                                  garnish  = :garnish,
                                                                  amount   = :amount,
-                                                                 unit     = :unit;
+                                                                 unit     = :unit,
+                                                                 modified = :now;

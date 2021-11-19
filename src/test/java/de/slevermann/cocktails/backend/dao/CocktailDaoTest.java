@@ -1,9 +1,10 @@
 package de.slevermann.cocktails.backend.dao;
 
 import de.slevermann.cocktails.backend.model.db.DbCocktail;
-import de.slevermann.cocktails.backend.model.db.DbCocktailIngredient;
 import de.slevermann.cocktails.backend.model.db.DbCreateCocktail;
+import de.slevermann.cocktails.backend.model.db.DbCreateCocktailIngredient;
 import de.slevermann.cocktails.backend.model.db.DbCreateIngredient;
+import de.slevermann.cocktails.backend.model.db.DbCreateInstruction;
 import de.slevermann.cocktails.backend.model.db.DbIngredient;
 import de.slevermann.cocktails.backend.model.db.DbIngredientType;
 import de.slevermann.cocktails.backend.model.db.DbInstruction;
@@ -108,6 +109,7 @@ public class CocktailDaoTest extends DaoTestBase {
         assertEquals("newName", updated.name());
         assertEquals("newDescription", updated.description());
         assertEquals(updated, cocktailDao.getById(firstCocktail.id()));
+        assertTrue(updated.created().isBefore(updated.modified()));
         firstCocktail = updated;
     }
 
@@ -139,8 +141,8 @@ public class CocktailDaoTest extends DaoTestBase {
         firstCocktail = cocktailDao.create(new DbCreateCocktail("cocktail", "description"));
 
         cocktailDao.addIngredients(firstCocktail.id(), Set.of(
-                new DbCocktailIngredient(firstIngredient, 1.0d, grams, false, false),
-                new DbCocktailIngredient(secondIngredient, 20d, milliliters, false, false)
+                new DbCreateCocktailIngredient(firstIngredient, 1.0d, grams, false, false),
+                new DbCreateCocktailIngredient(secondIngredient, 20d, milliliters, false, false)
         ));
 
         final var ingredients = cocktailDao.getIngredients(firstCocktail.id());
@@ -155,7 +157,7 @@ public class CocktailDaoTest extends DaoTestBase {
     @Test
     void testAddSingleIngredient() {
         cocktailDao.addIngredient(secondCocktail.id(),
-                new DbCocktailIngredient(secondIngredient, 20d, milliliters, false, false));
+                new DbCreateCocktailIngredient(secondIngredient, 20d, milliliters, false, false));
 
         final var ingredients = cocktailDao.getIngredients(secondCocktail.id());
         assertEquals(1, ingredients.size());
@@ -166,7 +168,7 @@ public class CocktailDaoTest extends DaoTestBase {
     @Test
     void testRemoveIngredients() {
         cocktailDao.addIngredient(firstCocktail.id(),
-                new DbCocktailIngredient(thirdIngredient, 20d, milliliters, false, false));
+                new DbCreateCocktailIngredient(thirdIngredient, 20d, milliliters, false, false));
 
         cocktailDao.removeIngredients(firstCocktail.id(), Set.of(firstIngredient.id(), secondIngredient.id()));
 
@@ -194,23 +196,25 @@ public class CocktailDaoTest extends DaoTestBase {
         assertFalse(ingredients.get(0).optional());
 
         cocktailDao.addIngredient(firstCocktail.id(),
-                new DbCocktailIngredient(thirdIngredient, 40d, grams, true, true));
+                new DbCreateCocktailIngredient(thirdIngredient, 40d, grams, true, true));
 
-        ingredients = cocktailDao.getIngredients(firstCocktail.id());
-        assertEquals(1, ingredients.size());
-        assertEquals(thirdIngredient.id(), ingredients.get(0).id());
-        assertEquals(40d, ingredients.get(0).amount());
-        assertEquals(grams, ingredients.get(0).unit());
-        assertTrue(ingredients.get(0).garnish());
-        assertTrue(ingredients.get(0).optional());
+        final var newIngredients = cocktailDao.getIngredients(firstCocktail.id());
+        assertEquals(1, newIngredients.size());
+        assertEquals(thirdIngredient.id(), newIngredients.get(0).id());
+        assertEquals(40d, newIngredients.get(0).amount());
+        assertEquals(grams, newIngredients.get(0).unit());
+        assertTrue(newIngredients.get(0).garnish());
+        assertTrue(newIngredients.get(0).optional());
+        assertEquals(ingredients.get(0).created(), newIngredients.get(0).created());
+        assertTrue(ingredients.get(0).modified().isBefore(newIngredients.get(0).modified()));
     }
 
     @Order(75)
     @Test
     void testAddInstructions() {
         final var instructions = cocktailDao.addInstructions(firstCocktail.id(), Set.of(
-                new DbInstruction("do the thing", 100),
-                new DbInstruction("do another thing", 200)
+                new DbCreateInstruction("do the thing", 100),
+                new DbCreateInstruction("do another thing", 200)
         ));
         assertEquals(2, instructions.size());
         for (final var i : instructions) {
@@ -234,7 +238,7 @@ public class CocktailDaoTest extends DaoTestBase {
 
     /*
      * Probability of generating 1000 random integers which are monotonically increasing
-     * 10 times in a row are vanishingly small.
+     * 10 times in a row is vanishingly small.
      */
     @Order(90)
     @RepeatedTest(10)
@@ -249,7 +253,7 @@ public class CocktailDaoTest extends DaoTestBase {
         final var numberList = new ArrayList<>(numbers.stream().toList());
         Collections.shuffle(numberList, random);
         final var instructions = numberList.stream().map(i ->
-                new DbInstruction(String.format("instruction number %d", i), i)).collect(Collectors.toSet());
+                new DbCreateInstruction(String.format("instruction number %d", i), i)).collect(Collectors.toSet());
         cocktailDao.addInstructions(secondCocktail.id(), instructions);
 
         final var dbInstructions = cocktailDao.getInstructions(secondCocktail.id());

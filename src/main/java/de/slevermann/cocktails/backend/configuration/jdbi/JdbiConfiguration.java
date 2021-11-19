@@ -15,12 +15,14 @@ import org.jdbi.v3.core.mapper.RowMapper;
 import org.jdbi.v3.core.spi.JdbiPlugin;
 import org.jdbi.v3.postgres.PostgresPlugin;
 import org.jdbi.v3.sqlobject.SqlObjectPlugin;
+import org.jdbi.v3.sqlobject.customizer.TimestampedConfig;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy;
 
 import javax.sql.DataSource;
+import java.time.ZoneOffset;
 import java.util.List;
 
 @Configuration
@@ -59,6 +61,7 @@ public class JdbiConfiguration {
         if (config.isEnabled()) {
             jdbi.setSqlLogger(jdbiLogger);
         }
+        jdbi.getConfig().get(TimestampedConfig.class).setTimezone(ZoneOffset.UTC);
         return jdbi;
     }
 

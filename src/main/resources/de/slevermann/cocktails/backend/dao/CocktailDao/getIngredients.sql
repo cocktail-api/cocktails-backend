@@ -6,7 +6,9 @@ select i.uuid        as ingredient_uuid,
        ci.unit       as unit,
        ci.amount     as amount,
        ci.garnish    as garnish,
-       ci.optional   as optional
+       ci.optional   as optional,
+       ci.created    as ci_created,
+       ci.modified   as ci_modified
 from ingredient i
          join ingredient_type it on i.type = it.id
          join cocktail_ingredient ci on i.id = ci.ingredient
