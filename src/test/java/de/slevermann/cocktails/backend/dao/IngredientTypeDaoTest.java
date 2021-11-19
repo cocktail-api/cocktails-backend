@@ -1,12 +1,9 @@
 package de.slevermann.cocktails.backend.dao;
 
 import de.slevermann.cocktails.backend.model.db.DbCreateIngredient;
-import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.annotation.Rollback;
 
 import java.util.UUID;
 
@@ -14,8 +11,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-@Rollback(false)
 class IngredientTypeDaoTest extends DaoTestBase {
 
     @Autowired
@@ -26,13 +21,13 @@ class IngredientTypeDaoTest extends DaoTestBase {
 
     UUID createdUuid;
 
-    @Order(1)
+    @Order(5)
     @Test
     void testInitialEmpty() {
         assertEquals(0, ingredientTypeDao.count());
     }
 
-    @Order(2)
+    @Order(10)
     @Test
     void testCreate() {
         final var ingredient = ingredientTypeDao.create("Juice");
@@ -41,7 +36,7 @@ class IngredientTypeDaoTest extends DaoTestBase {
         createdUuid = ingredient.id();
     }
 
-    @Order(3)
+    @Order(15)
     @Test
     void testGetById() {
         final var ingredient = ingredientTypeDao.getById(createdUuid);
@@ -50,13 +45,13 @@ class IngredientTypeDaoTest extends DaoTestBase {
         assertEquals(createdUuid, ingredient.id());
     }
 
-    @Order(4)
+    @Order(20)
     @Test
     void testGetByIdMissing() {
         assertNull(ingredientTypeDao.getById(UUID.randomUUID()));
     }
 
-    @Order(5)
+    @Order(25)
     @Test
     void testCount() {
         assertEquals(1, ingredientTypeDao.count());
@@ -66,7 +61,7 @@ class IngredientTypeDaoTest extends DaoTestBase {
         assertEquals(2, ingredientTypeDao.count());
     }
 
-    @Order(6)
+    @Order(30)
     @Test
     void testOffsets() {
         assertEquals(2, ingredientTypeDao.getAll(0, 2).size());
@@ -75,7 +70,7 @@ class IngredientTypeDaoTest extends DaoTestBase {
         assertEquals(1, ingredientTypeDao.getAll(1, 1).size());
     }
 
-    @Order(7)
+    @Order(35)
     @Test
     void testDelete() {
         assertEquals(1, ingredientTypeDao.delete(createdUuid));
@@ -83,14 +78,14 @@ class IngredientTypeDaoTest extends DaoTestBase {
         assertEquals(1, ingredientTypeDao.count());
     }
 
-    @Order(8)
+    @Order(40)
     @Test
     void testDeleteMissing() {
         assertEquals(0, ingredientTypeDao.delete(UUID.randomUUID()));
         assertEquals(1, ingredientTypeDao.count());
     }
 
-    @Order(9)
+    @Order(45)
     @Test
     void testUseCount() {
         final var newType = ingredientTypeDao.create("new");
@@ -107,7 +102,7 @@ class IngredientTypeDaoTest extends DaoTestBase {
         assertEquals(2, ingredientTypeDao.usedByCount(newType.id()));
     }
 
-    @Order(10)
+    @Order(50)
     @Test
     void testUpdate() {
         final var type = ingredientTypeDao.create("newType");

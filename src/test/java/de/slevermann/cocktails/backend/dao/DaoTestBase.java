@@ -5,15 +5,20 @@ import de.slevermann.cocktails.backend.JdbiTest;
 import org.jdbi.v3.core.Jdbi;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.Rollback;
 
 /*
  * Test base class for testing DAOs. Automatically provides a clean
  * database for testing, and cleans the database again after tests are through.
  */
 @JdbiTest
+@Rollback(false)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public abstract class DaoTestBase extends ContainerTestBase {
 
     @Autowired
