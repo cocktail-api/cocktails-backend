@@ -4,21 +4,19 @@ import de.slevermann.cocktails.api.model.Cocktail;
 import de.slevermann.cocktails.api.model.CocktailListEntry;
 import de.slevermann.cocktails.backend.dao.CocktailDao;
 import de.slevermann.cocktails.backend.dao.IngredientDao;
-import de.slevermann.cocktails.backend.model.db.DbCocktail;
 import de.slevermann.cocktails.backend.model.mapper.CocktailMapper;
 import de.slevermann.cocktails.backend.service.problem.NoSuchResourceProblem;
 import de.slevermann.cocktails.backend.service.problem.ResourceType;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
+@Transactional
 public class CocktailService {
 
     private final CocktailDao cocktailDao;
@@ -32,7 +30,6 @@ public class CocktailService {
                 .stream().map(cocktailMapper::fromDb).toList();
     }
 
-    @Transactional
     public Cocktail cocktail(final UUID uuid) {
         final var fromDb = cocktailDao.findById(uuid);
 

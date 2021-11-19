@@ -19,6 +19,7 @@ import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
+@Transactional
 public class IngredientService {
 
     private final IngredientDao ingredientDao;
@@ -36,7 +37,6 @@ public class IngredientService {
         return ingredientDao.count();
     }
 
-    @Transactional
     public Ingredient create(final CreateIngredient createIngredient) {
         final var typeId = createIngredient.getType();
         final var type = ingredientTypeDao.getById(typeId);
@@ -47,7 +47,6 @@ public class IngredientService {
                 ingredientDao.create(ingredientMapper.fromApi(createIngredient)));
     }
 
-    @Transactional
     public void delete(final UUID uuid) {
         if (ingredientDao.usedByCount(uuid) > 0) {
             throw new ReferencedEntityProblem(ResourceType.INGREDIENT, uuid.toString());
