@@ -67,7 +67,7 @@ public class CocktailServiceTest {
     void testGetCocktail() {
         final var id = randomUUID();
         final var cocktail = new DbCocktail(id, "name", "description");
-        when(cocktailDao.findById(id)).thenReturn(cocktail);
+        when(cocktailDao.getById(id)).thenReturn(cocktail);
         final var type = new DbIngredientType(randomUUID(), "type");
         final var ingredient = new DbIngredient(randomUUID(), type, "name", "description");
         final var ingredients = List.of(new DbCocktailIngredient(ingredient, 20d, DbUnit.milliliters));
@@ -81,7 +81,7 @@ public class CocktailServiceTest {
 
     @Test
     void testCocktailNotFound() {
-        when(cocktailDao.findById(any())).thenReturn(null);
+        when(cocktailDao.getById(any())).thenReturn(null);
 
         final var id = randomUUID();
         final var ex = assertThrows(NoSuchResourceProblem.class, () -> cocktailService.cocktail(id));

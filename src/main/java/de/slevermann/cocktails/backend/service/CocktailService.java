@@ -31,7 +31,7 @@ public class CocktailService {
     }
 
     public Cocktail cocktail(final UUID uuid) {
-        final var fromDb = cocktailDao.findById(uuid);
+        final var fromDb = cocktailDao.getById(uuid);
 
         if (fromDb == null) {
             throw new NoSuchResourceProblem(ResourceType.COCKTAIL, uuid.toString());
