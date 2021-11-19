@@ -14,6 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 class IngredientTypeDaoTest extends DaoTestBase {
@@ -137,7 +138,8 @@ class IngredientTypeDaoTest extends DaoTestBase {
 
         final var updated = ingredientTypeDao.update(type.id(), "newName");
         assertEquals("newName", updated.name());
-
         assertEquals(updated, ingredientTypeDao.getById(type.id()));
+        assertEquals(type.created(), updated.created());
+        assertTrue(updated.created().isBefore(updated.modified()));
     }
 }

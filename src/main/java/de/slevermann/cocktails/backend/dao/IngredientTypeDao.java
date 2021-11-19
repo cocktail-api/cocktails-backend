@@ -3,6 +3,7 @@ package de.slevermann.cocktails.backend.dao;
 import de.slevermann.cocktails.backend.model.db.DbIngredientType;
 import io.micrometer.core.annotation.Timed;
 import org.jdbi.v3.sqlobject.customizer.Bind;
+import org.jdbi.v3.sqlobject.customizer.Timestamped;
 import org.jdbi.v3.sqlobject.locator.UseClasspathSqlLocator;
 import org.jdbi.v3.sqlobject.statement.GetGeneratedKeys;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
@@ -56,6 +57,7 @@ public interface IngredientTypeDao {
     @Timed(value = "types.update",
             description = "Performance of ingredient type update",
             percentiles = {0.99, 0.95, 0.9, 0.5})
+    @Timestamped
     DbIngredientType update(@Bind("uuid") final UUID uuid, @Bind("name") final String name);
 
 }
