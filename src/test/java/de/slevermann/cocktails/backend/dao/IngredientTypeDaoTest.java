@@ -1,6 +1,6 @@
 package de.slevermann.cocktails.backend.dao;
 
-import de.slevermann.cocktails.backend.model.db.DbCreateIngredient;
+import de.slevermann.cocktails.backend.model.db.create.DbCreateIngredient;
 import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;

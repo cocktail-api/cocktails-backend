@@ -1,7 +1,7 @@
 package de.slevermann.cocktails.backend.dao;
 
 import de.slevermann.cocktails.backend.model.db.DbCocktailIngredient;
-import de.slevermann.cocktails.backend.model.db.DbCreateIngredient;
+import de.slevermann.cocktails.backend.model.db.create.DbCreateIngredient;
 import de.slevermann.cocktails.backend.model.db.DbIngredient;
 import io.micrometer.core.annotation.Timed;
 import org.jdbi.v3.sqlobject.customizer.Bind;

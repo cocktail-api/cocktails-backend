@@ -1,10 +1,10 @@
 package de.slevermann.cocktails.backend.dao;
 
 import de.slevermann.cocktails.backend.model.db.DbCocktail;
-import de.slevermann.cocktails.backend.model.db.DbCreateCocktail;
-import de.slevermann.cocktails.backend.model.db.DbCreateCocktailIngredient;
-import de.slevermann.cocktails.backend.model.db.DbCreateIngredient;
-import de.slevermann.cocktails.backend.model.db.DbCreateInstruction;
+import de.slevermann.cocktails.backend.model.db.create.DbCreateCocktail;
+import de.slevermann.cocktails.backend.model.db.create.DbCreateCocktailIngredient;
+import de.slevermann.cocktails.backend.model.db.create.DbCreateIngredient;
+import de.slevermann.cocktails.backend.model.db.create.DbCreateInstruction;
 import de.slevermann.cocktails.backend.model.db.DbIngredient;
 import de.slevermann.cocktails.backend.model.db.DbIngredientType;
 import de.slevermann.cocktails.backend.model.db.DbInstruction;

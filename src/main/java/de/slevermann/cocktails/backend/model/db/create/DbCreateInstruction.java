@@ -1,4 +1,4 @@
-package de.slevermann.cocktails.backend.model.db;
+package de.slevermann.cocktails.backend.model.db.create;
 
 import lombok.NonNull;
 

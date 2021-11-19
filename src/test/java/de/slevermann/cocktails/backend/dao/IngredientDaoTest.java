@@ -1,6 +1,6 @@
 package de.slevermann.cocktails.backend.dao;
 
-import de.slevermann.cocktails.backend.model.db.DbCreateIngredient;
+import de.slevermann.cocktails.backend.model.db.create.DbCreateIngredient;
 import de.slevermann.cocktails.backend.model.db.DbIngredient;
 import de.slevermann.cocktails.backend.model.db.DbIngredientType;
 import org.junit.jupiter.api.Disabled;

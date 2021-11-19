@@ -4,7 +4,7 @@ import de.slevermann.cocktails.api.model.CreateIngredient;
 import de.slevermann.cocktails.api.model.Ingredient;
 import de.slevermann.cocktails.backend.dao.IngredientDao;
 import de.slevermann.cocktails.backend.dao.IngredientTypeDao;
-import de.slevermann.cocktails.backend.model.db.DbCreateIngredient;
+import de.slevermann.cocktails.backend.model.db.create.DbCreateIngredient;
 import de.slevermann.cocktails.backend.model.db.DbIngredient;
 import de.slevermann.cocktails.backend.model.db.DbIngredientType;
 import de.slevermann.cocktails.backend.model.mapper.IngredientMapper;
