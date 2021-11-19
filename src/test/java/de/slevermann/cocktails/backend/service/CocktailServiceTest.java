@@ -3,7 +3,6 @@ package de.slevermann.cocktails.backend.service;
 import de.slevermann.cocktails.api.model.Cocktail;
 import de.slevermann.cocktails.api.model.CocktailListEntry;
 import de.slevermann.cocktails.backend.dao.CocktailDao;
-import de.slevermann.cocktails.backend.dao.IngredientDao;
 import de.slevermann.cocktails.backend.model.db.DbCocktail;
 import de.slevermann.cocktails.backend.model.db.DbCocktailIngredient;
 import de.slevermann.cocktails.backend.model.db.DbIngredient;
@@ -32,9 +31,6 @@ public class CocktailServiceTest {
 
     @Mock
     private CocktailDao cocktailDao;
-
-    @Mock
-    private IngredientDao ingredientDao;
 
     @Mock
     private CocktailMapper cocktailMapper;
@@ -70,8 +66,12 @@ public class CocktailServiceTest {
         when(cocktailDao.getById(id)).thenReturn(cocktail);
         final var type = new DbIngredientType(randomUUID(), "type");
         final var ingredient = new DbIngredient(randomUUID(), type, "name", "description");
-        final var ingredients = List.of(new DbCocktailIngredient(ingredient, 20d, DbUnit.milliliters));
-        when(ingredientDao.findByCocktail(id)).thenReturn(ingredients);
+        final var ingredients = List.of(new DbCocktailIngredient(ingredient,
+                20d,
+                DbUnit.milliliters,
+                false,
+                false));
+        when(cocktailDao.getIngredients(id)).thenReturn(ingredients);
         final var apiCocktail = new Cocktail()
                 .id(id).name("name").description("description");
         when(cocktailMapper.fromDb(any(), any())).thenReturn(apiCocktail);

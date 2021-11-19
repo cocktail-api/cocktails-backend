@@ -24,6 +24,8 @@ public class CocktailIngredientMapper implements RowMapper<DbCocktailIngredient>
         final var amount = rs.getBigDecimal("amount");
         return new DbCocktailIngredient(ingredient,
                 amount == null ? null : amount.doubleValue(),
-                unitColumnMapper.map(rs, "unit", ctx));
+                unitColumnMapper.map(rs, "unit", ctx),
+                rs.getBoolean("garnish"),
+                rs.getBoolean("optional"));
     }
 }

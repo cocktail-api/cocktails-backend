@@ -9,9 +9,22 @@ public record DbCocktailIngredient(@NonNull UUID id,
                                    @NonNull String name,
                                    String description,
                                    Double amount,
-                                   DbUnit unit) {
+                                   DbUnit unit,
+                                   boolean garnish,
+                                   boolean optional) {
 
-    public DbCocktailIngredient(@NonNull final DbIngredient ingredient, final Double amount, final DbUnit unit) {
-        this(ingredient.id(), ingredient.type(), ingredient.name(), ingredient.description(), amount, unit);
+    public DbCocktailIngredient(@NonNull final DbIngredient ingredient,
+                                final Double amount,
+                                final DbUnit unit,
+                                boolean garnish,
+                                boolean optional) {
+        this(ingredient.id(),
+                ingredient.type(),
+                ingredient.name(),
+                ingredient.description(),
+                amount,
+                unit,
+                garnish,
+                optional);
     }
 }
