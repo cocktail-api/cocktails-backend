@@ -1,8 +1,11 @@
 package de.slevermann.cocktails.backend.dao;
 
 import de.slevermann.cocktails.backend.model.db.DbCreateIngredient;
+import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.postgresql.util.PSQLException;
+import org.postgresql.util.PSQLState;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.UUID;
@@ -10,6 +13,8 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
 
 class IngredientTypeDaoTest extends DaoTestBase {
 
@@ -34,6 +39,17 @@ class IngredientTypeDaoTest extends DaoTestBase {
         assertNotNull(ingredient.id());
         assertEquals("Juice", ingredient.name());
         createdUuid = ingredient.id();
+    }
+
+    @Order(11)
+    @Test
+    void testCreateNameExists() {
+        final var ex = assertThrows(UnableToExecuteStatementException.class, () -> ingredientTypeDao.create("Juice"));
+        if (ex.getCause() instanceof PSQLException psqlException) {
+            assertEquals(psqlException.getSQLState(), PSQLState.UNIQUE_VIOLATION.getState());
+        } else {
+            fail();
+        }
     }
 
     @Order(15)
