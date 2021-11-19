@@ -52,6 +52,17 @@ class IngredientTypeDaoTest extends DaoTestBase {
         }
     }
 
+    @Order(12)
+    @Test
+    void testCreateNameExistsIgnoreCase() {
+        final var ex = assertThrows(UnableToExecuteStatementException.class, () -> ingredientTypeDao.create("jUICE"));
+        if (ex.getCause() instanceof PSQLException psqlException) {
+            assertEquals(psqlException.getSQLState(), PSQLState.UNIQUE_VIOLATION.getState());
+        } else {
+            fail();
+        }
+    }
+
     @Order(15)
     @Test
     void testGetById() {
