@@ -10,6 +10,7 @@ import org.jdbi.v3.sqlobject.statement.SqlBatch;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -79,5 +80,11 @@ public interface UserDao {
             description = "Performance of getting a user's shelf",
             percentiles = {0.99, 0.95, 0.9, 0.5})
     Set<DbIngredient> getShelf(@Bind("uuid") final UUID uuid);
+
+    @SqlQuery
+    @Timed(value = "users.getAll",
+            description = "Performance of user list fetching",
+            percentiles = {0.99, 0.95, 0.9, 0.5})
+    List<DbUser> getAll(@Bind("offset") final int offset, @Bind("pageSize") final int pageSize);
 
 }

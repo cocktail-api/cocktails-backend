@@ -72,31 +72,40 @@ public class UserDaoTest extends DaoTestBase {
 
     @Order(5)
     @Test
+    void testOffsets() {
+        assertEquals(2, userDao.getAll(0, 2).size());
+
+        assertEquals(1, userDao.getAll(0, 1).size());
+        assertEquals(1, userDao.getAll(1, 1).size());
+    }
+
+    @Order(6)
+    @Test
     void testGetByNick() {
         assertEquals(first, userDao.getByNick("hello"));
     }
 
-    @Order(6)
+    @Order(7)
     @Test
     void testGetByNickMissing() {
         assertNull(userDao.getByNick("does not exist"));
     }
 
-    @Order(7)
+    @Order(8)
     @Test
     void testDelete() {
         assertEquals(1, userDao.delete(second.id()));
         assertEquals(1, userDao.count());
     }
 
-    @Order(8)
+    @Order(9)
     @Test
     void testDeleteMissing() {
         assertEquals(0, userDao.delete(UUID.randomUUID()));
         assertEquals(1, userDao.count());
     }
 
-    @Order(9)
+    @Order(10)
     @Test
     void testAddToShelf() {
         type = typeDao.create("type");
@@ -113,14 +122,14 @@ public class UserDaoTest extends DaoTestBase {
                 .map(DbIngredient::id).collect(Collectors.toSet()));
     }
 
-    @Order(10)
+    @Order(11)
     @Test
     void testAddSingleToShelf() {
         second = userDao.create();
         userDao.addToShelf(second.id(), firstIngredient.id());
     }
 
-    @Order(11)
+    @Order(12)
     @Test
     void testGetShelf() {
         final var firstShelf = userDao.getShelf(first.id());
@@ -130,7 +139,7 @@ public class UserDaoTest extends DaoTestBase {
         assertEquals(1, secondShelf.size());
     }
 
-    @Order(12)
+    @Order(13)
     @Test
     void testRemoveFromShelf() {
         userDao.removeFromShelf(first.id(), Stream.of(secondIngredient)
@@ -138,21 +147,21 @@ public class UserDaoTest extends DaoTestBase {
         assertEquals(1, userDao.getShelf(first.id()).size());
     }
 
-    @Order(13)
+    @Order(14)
     @Test
     void testRemoveFromShelfSingle() {
         userDao.removeFromShelf(second.id(), firstIngredient.id());
         assertEquals(0, userDao.getShelf(second.id()).size());
     }
 
-    @Order(14)
+    @Order(15)
     @Test
     void testAddToShelfExisting() {
         userDao.addToShelf(first.id(), firstIngredient.id());
         assertEquals(1, userDao.getShelf(first.id()).size());
     }
 
-    @Order(15)
+    @Order(16)
     @Test
     void createWithNick() {
         final var created = userDao.create("newguy");
