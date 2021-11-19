@@ -3,6 +3,7 @@ package de.slevermann.cocktails.backend.dao;
 import de.slevermann.cocktails.backend.model.db.DbCocktail;
 import de.slevermann.cocktails.backend.model.db.DbCocktailIngredient;
 import de.slevermann.cocktails.backend.model.db.DbCreateCocktail;
+import de.slevermann.cocktails.backend.model.db.DbInstruction;
 import io.micrometer.core.annotation.Timed;
 import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.customizer.BindMethods;
@@ -83,4 +84,23 @@ public interface CocktailDao {
     default void removeIngredient(final UUID cocktail, final UUID ingredient) {
         removeIngredients(cocktail, Set.of(ingredient));
     }
+
+    @GetGeneratedKeys
+    @SqlBatch
+    @Timed(value = "cocktails.addInstructions",
+            description = "Performance of cocktail instruction creation",
+            percentiles = {0.99, 0.95, 0.9, 0.5})
+    Set<DbInstruction> addInstructions(@Bind("cocktail") final UUID cocktail, @BindMethods final Set<DbInstruction> instructions);
+
+    @SqlQuery
+    @Timed(value = "cocktails.getInstructions",
+            description = "Performance of cocktail instruction fetch",
+            percentiles = {0.99, 0.95, 0.9, 0.5})
+    List<DbInstruction> getInstructions(@Bind("cocktail") final UUID cocktail);
+
+    @SqlUpdate
+    @Timed(value = "cocktails.clearInstructions",
+            description = "Performance of cocktail instruction clearing",
+            percentiles = {0.99, 0.95, 0.9, 0.5})
+    int clearInstructions(@Bind("cocktail") final UUID cocktail);
 }

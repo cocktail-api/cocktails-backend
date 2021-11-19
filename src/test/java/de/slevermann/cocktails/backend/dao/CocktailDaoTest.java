@@ -6,12 +6,19 @@ import de.slevermann.cocktails.backend.model.db.DbCreateCocktail;
 import de.slevermann.cocktails.backend.model.db.DbCreateIngredient;
 import de.slevermann.cocktails.backend.model.db.DbIngredient;
 import de.slevermann.cocktails.backend.model.db.DbIngredientType;
+import de.slevermann.cocktails.backend.model.db.DbInstruction;
 import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static de.slevermann.cocktails.backend.model.db.DbUnit.grams;
 import static de.slevermann.cocktails.backend.model.db.DbUnit.milliliters;
@@ -43,6 +50,10 @@ public class CocktailDaoTest extends DaoTestBase {
     DbIngredient secondIngredient;
 
     DbIngredient thirdIngredient;
+
+    DbInstruction firstInstruction;
+
+    DbInstruction secondInstruction;
 
     @Order(5)
     @Test
@@ -192,5 +203,65 @@ public class CocktailDaoTest extends DaoTestBase {
         assertEquals(grams, ingredients.get(0).unit());
         assertTrue(ingredients.get(0).garnish());
         assertTrue(ingredients.get(0).optional());
+    }
+
+    @Order(75)
+    @Test
+    void testAddInstructions() {
+        final var instructions = cocktailDao.addInstructions(firstCocktail.id(), Set.of(
+                new DbInstruction("do the thing", 100),
+                new DbInstruction("do another thing", 200)
+        ));
+        assertEquals(2, instructions.size());
+        for (final var i : instructions) {
+            if (i.number() == 100) firstInstruction = i;
+            else secondInstruction = i;
+        }
+    }
+
+    @Order(80)
+    @Test
+    void testGetInstructions() {
+        assertEquals(2, cocktailDao.getInstructions(firstCocktail.id()).size());
+    }
+
+    @Order(85)
+    @Test
+    void testClearInstructions() {
+        assertEquals(2, cocktailDao.clearInstructions(firstCocktail.id()));
+        assertEquals(0, cocktailDao.getInstructions(firstCocktail.id()).size());
+    }
+
+    /*
+     * Probability of generating 1000 random integers which are monotonically increasing
+     * 10 times in a row are vanishingly small.
+     */
+    @Order(90)
+    @RepeatedTest(10)
+    void testGetInstructionsOrder() {
+        final var numbers = new HashSet<Integer>();
+        final var random = new Random();
+        // Generate into a set for deduplication
+        for (int i = 0; i < 1000; i++) {
+            numbers.add(random.nextInt(Integer.MAX_VALUE));
+        }
+        // Shuffle the generated numbers around, because hashcode order == numeric order
+        final var numberList = new ArrayList<>(numbers.stream().toList());
+        Collections.shuffle(numberList, random);
+        final var instructions = numberList.stream().map(i ->
+                new DbInstruction(String.format("instruction number %d", i), i)).collect(Collectors.toSet());
+        cocktailDao.addInstructions(secondCocktail.id(), instructions);
+
+        final var dbInstructions = cocktailDao.getInstructions(secondCocktail.id());
+        assertEquals(numbers.size(), instructions.size());
+
+        DbInstruction prev = null;
+        for (final var instruction : dbInstructions) {
+            if (prev != null) {
+                assertTrue(prev.number() < instruction.number());
+            }
+            prev = instruction;
+        }
+        assertEquals(numbers.size(), cocktailDao.clearInstructions(secondCocktail.id()));
     }
 }
