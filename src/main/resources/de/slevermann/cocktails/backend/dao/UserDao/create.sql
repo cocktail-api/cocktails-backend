@@ -1,3 +1,3 @@
-INSERT INTO "user" (nick)
-VALUES (:nick)
-RETURNING uuid AS user_uuid, nick AS user_nick;
+insert into "user" (nick)
+values (:nick)
+returning uuid as user_uuid, nick as user_nick;

@@ -1,3 +1,3 @@
 delete
 from ingredient
-where uuid = :uuid
+where uuid = :uuid;

@@ -26,12 +26,12 @@ public abstract class DaoTestBase extends ContainerTestBase {
 
     private void truncate() {
         jdbi.useHandle(h -> {
-            h.execute("TRUNCATE TABLE user_ingredient CASCADE");
-            h.execute("TRUNCATE TABLE \"user\" CASCADE");
-            h.execute("TRUNCATE TABLE cocktail_ingredient CASCADE");
-            h.execute("TRUNCATE TABLE cocktail CASCADE");
-            h.execute("TRUNCATE TABLE ingredient CASCADE");
-            h.execute("TRUNCATE TABLE ingredient_type CASCADE");
+            h.execute("truncate table user_ingredient cascade");
+            h.execute("truncate table \"user\" cascade");
+            h.execute("truncate table cocktail_ingredient cascade");
+            h.execute("truncate table cocktail cascade");
+            h.execute("truncate table ingredient cascade");
+            h.execute("truncate table ingredient_type cascade");
         });
     }
 

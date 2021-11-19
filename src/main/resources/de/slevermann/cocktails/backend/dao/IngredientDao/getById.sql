@@ -1,8 +1,8 @@
-SELECT i.uuid        as ingredient_uuid,
+select i.uuid        as ingredient_uuid,
        i.name        as ingredient_name,
        i.description as ingredient_description,
        it.name       as type_name,
        it.uuid       as type_uuid
-FROM ingredient i
+from ingredient i
          JOIN ingredient_type it on i.type = it.id
-WHERE i.uuid = :uuid
+where i.uuid = :uuid;

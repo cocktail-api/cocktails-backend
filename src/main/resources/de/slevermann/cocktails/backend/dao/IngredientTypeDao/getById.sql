@@ -1,4 +1,4 @@
-SELECT name as type_name,
+select name as type_name,
        uuid as type_uuid
-FROM ingredient_type
-WHERE uuid = :uuid
+from ingredient_type
+where uuid = :uuid;

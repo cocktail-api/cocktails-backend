@@ -1,3 +1,3 @@
-DELETE
-FROM ingredient_type
-WHERE uuid = :uuid
+delete
+from ingredient_type
+where uuid = :uuid;

@@ -1,5 +1,5 @@
-UPDATE cocktail
-SET name        = :name,
+update cocktail
+set name        = :name,
     description = :description
-WHERE uuid = :uuid
-RETURNING uuid AS cocktail_uuid, name AS cocktail_name, description AS cocktail_description;
+where uuid = :uuid
+returning uuid as cocktail_uuid, name as cocktail_name, description as cocktail_description;

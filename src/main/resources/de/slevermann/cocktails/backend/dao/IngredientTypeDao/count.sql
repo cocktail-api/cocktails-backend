@@ -1,2 +1,2 @@
-SELECT COUNT(*)
-FROM ingredient_type
+select count(*)
+from ingredient_type;

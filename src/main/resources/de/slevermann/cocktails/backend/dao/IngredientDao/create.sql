@@ -1,13 +1,13 @@
-WITH i AS (INSERT INTO ingredient (name, description, type)
-    SELECT :name,
+with i as (insert into ingredient (name, description, type)
+    select :name,
            :description,
-           (SELECT it.id FROM ingredient_type it WHERE it.uuid = :type)
-    RETURNING uuid, name, description, type
+           (select it.id from ingredient_type it where it.uuid = :type)
+    returning uuid, name, description, type
 )
-SELECT i.uuid        AS ingredient_uuid,
-       i.name        AS ingredient_name,
-       i.description AS ingredient_description,
-       it.name       AS type_name,
-       it.uuid       AS type_uuid
-FROM i
-         JOIN ingredient_type it ON i.type = it.id
+select i.uuid        as ingredient_uuid,
+       i.name        as ingredient_name,
+       i.description as ingredient_description,
+       it.name       as type_name,
+       it.uuid       as type_uuid
+from i
+         join ingredient_type it on i.type = it.id;

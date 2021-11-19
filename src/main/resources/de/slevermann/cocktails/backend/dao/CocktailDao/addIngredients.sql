@@ -1,7 +1,7 @@
-INSERT INTO cocktail_ingredient (cocktail, ingredient, optional, garnish, amount, unit)
-SELECT c.id, i.id, :optional, :garnish, :amount, :unit
-FROM cocktail c,
+insert into cocktail_ingredient (cocktail, ingredient, optional, garnish, amount, unit)
+select c.id, i.id, :optional, :garnish, :amount, :unit
+from cocktail c,
      ingredient i
-WHERE c.uuid = :cocktail
-  AND i.uuid = :id
-ON CONFLICT ON CONSTRAINT cocktail_ingredient_cocktail_ingredient_key DO NOTHING;
+where c.uuid = :cocktail
+  and i.uuid = :id
+on conflict on constraint cocktail_ingredient_cocktail_ingredient_key do nothing;

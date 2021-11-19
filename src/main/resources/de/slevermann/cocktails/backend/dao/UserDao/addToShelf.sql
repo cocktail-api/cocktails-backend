@@ -1,7 +1,7 @@
-INSERT INTO user_ingredient ("user", ingredient)
-SELECT u.id, i.id
-FROM "user" u,
+insert into user_ingredient ("user", ingredient)
+select u.id, i.id
+from "user" u,
      ingredient i
-WHERE u.uuid = :user
-  AND i.uuid = :ingredient
-ON CONFLICT ON CONSTRAINT user_ingredient_user_ingredient_key DO NOTHING;
+where u.uuid = :user
+  and i.uuid = :ingredient
+on conflict on constraint user_ingredient_user_ingredient_key do nothing;

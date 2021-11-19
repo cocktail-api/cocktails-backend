@@ -1,3 +1,3 @@
-INSERT INTO cocktail (name, description)
-VALUES (:name, :description)
-RETURNING uuid AS cocktail_uuid, name AS cocktail_name, description AS cocktail_description;
+insert into cocktail (name, description)
+values (:name, :description)
+returning uuid as cocktail_uuid, name as cocktail_name, description as cocktail_description;

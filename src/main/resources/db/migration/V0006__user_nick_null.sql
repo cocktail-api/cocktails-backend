@@ -1,2 +1,2 @@
-ALTER TABLE "user"
-    ALTER COLUMN nick DROP NOT NULL;
+alter table "user"
+    alter column nick drop not null;

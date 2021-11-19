@@ -1,4 +1,4 @@
-SELECT COUNT(*)
-FROM cocktail_ingredient
-         JOIN ingredient i on i.id = cocktail_ingredient.ingredient
-WHERE i.uuid = :uuid
+select count(*)
+from cocktail_ingredient
+         join ingredient i on i.id = cocktail_ingredient.ingredient
+where i.uuid = :uuid;

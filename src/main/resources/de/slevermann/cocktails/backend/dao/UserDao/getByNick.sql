@@ -1,4 +1,4 @@
-SELECT uuid AS user_uuid,
-       nick AS user_nick
-FROM "user"
-WHERE nick = :nick;
+select uuid as user_uuid,
+       nick as user_nick
+from "user"
+where nick = :nick;

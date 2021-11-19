@@ -1,3 +1,3 @@
-DELETE
-FROM cocktail
-WHERE uuid = :uuid;
+delete
+from cocktail
+where uuid = :uuid;

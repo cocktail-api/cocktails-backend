@@ -1,2 +1,2 @@
-SELECT COUNT(*)
-FROM cocktail
+select count(*)
+from cocktail;

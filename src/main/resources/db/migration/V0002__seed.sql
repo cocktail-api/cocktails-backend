@@ -1,5 +1,5 @@
-INSERT INTO ingredient_type (name)
-VALUES ('Strong alcohol'),
+insert into ingredient_type (name)
+values ('Strong alcohol'),
        ('Soft alcohol'),
        ('Soft drink'),
        ('Fruit juice'),
@@ -8,100 +8,100 @@ VALUES ('Strong alcohol'),
        ('Syrup'),
        ('Other');
 
-INSERT INTO ingredient (type, name, description)
-SELECT it.id, 'Bourbon', 'An american whiskey made from corn and other grain'
-FROM ingredient_type it
-WHERE it.name = 'Strong alcohol';
+insert into ingredient (type, name, description)
+select it.id, 'Bourbon', 'An american whiskey made from corn and other grain'
+from ingredient_type it
+where it.name = 'Strong alcohol';
 
-INSERT INTO ingredient (type, name, description)
-SELECT it.id, 'White rum', 'A white liquor distilled from sugarcane'
-FROM ingredient_type it
-WHERE it.name = 'Strong alcohol';
+insert into ingredient (type, name, description)
+select it.id, 'White rum', 'A white liquor distilled from sugarcane'
+from ingredient_type it
+where it.name = 'Strong alcohol';
 
-INSERT INTO ingredient (type, name, description)
-SELECT it.id, 'Dark rum', 'An aged liquor distilled from sugarcane'
-FROM ingredient_type it
-WHERE it.name = 'Strong alcohol';
+insert into ingredient (type, name, description)
+select it.id, 'Dark rum', 'An aged liquor distilled from sugarcane'
+from ingredient_type it
+where it.name = 'Strong alcohol';
 
-INSERT INTO ingredient (type, name, description)
-SELECT it.id, 'Lime juice', 'Juice. From limes. Big surprise.'
-FROM ingredient_type it
-WHERE it.name = 'Fruit juice';
+insert into ingredient (type, name, description)
+select it.id, 'Lime juice', 'Juice. From limes. Big surprise.'
+from ingredient_type it
+where it.name = 'Fruit juice';
 
-INSERT INTO ingredient (type, name, description)
-SELECT it.id, 'Lime', 'A green, sour citrus'
-FROM ingredient_type it
-WHERE it.name = 'Fruit';
+insert into ingredient (type, name, description)
+select it.id, 'Lime', 'A green, sour citrus'
+from ingredient_type it
+where it.name = 'Fruit';
 
-INSERT INTO ingredient (type, name, description)
-SELECT it.id, 'Ice cubes', 'Ice, in form of a cube.'
-FROM ingredient_type it
-WHERE it.name = 'Ice';
+insert into ingredient (type, name, description)
+select it.id, 'Ice cubes', 'Ice, in form of a cube.'
+from ingredient_type it
+where it.name = 'Ice';
 
-INSERT INTO ingredient (type, name, description)
-SELECT it.id, 'Ginger Beer', 'A spicy ginger drink.'
-FROM ingredient_type it
-WHERE it.name = 'Soft drink';
+insert into ingredient (type, name, description)
+select it.id, 'Ginger Beer', 'A spicy ginger drink.'
+from ingredient_type it
+where it.name = 'Soft drink';
 
-INSERT INTO ingredient (type, name, description)
-SELECT it.id, 'Simple syrup', 'Syrup made from sugar.'
-FROM ingredient_type it
-WHERE it.name = 'Syrup';
+insert into ingredient (type, name, description)
+select it.id, 'Simple syrup', 'Syrup made from sugar.'
+from ingredient_type it
+where it.name = 'Syrup';
 
-INSERT INTO cocktail (name)
-VALUES ('Daiquiri'),
+insert into cocktail (name)
+values ('Daiquiri'),
        ('Dark and Stormy');
 
-INSERT INTO cocktail_ingredient (cocktail, ingredient, optional, garnish)
-SELECT c.id, i.id, false, false
-FROM cocktail c,
+insert into cocktail_ingredient (cocktail, ingredient, optional, garnish)
+select c.id, i.id, false, false
+from cocktail c,
      ingredient i
-WHERE c.name = 'Daiquiri' AND i.name = 'White rum';
+where c.name = 'Daiquiri' and i.name = 'White rum';
 
-INSERT INTO cocktail_ingredient (cocktail, ingredient, optional, garnish)
-SELECT c.id, i.id, false, false
-FROM cocktail c,
+insert into cocktail_ingredient (cocktail, ingredient, optional, garnish)
+select c.id, i.id, false, false
+from cocktail c,
      ingredient i
-WHERE c.name = 'Daiquiri' AND i.name = 'Simple syrup';
+where c.name = 'Daiquiri' and i.name = 'Simple syrup';
 
-INSERT INTO cocktail_ingredient (cocktail, ingredient, optional, garnish)
-SELECT c.id, i.id, false, false
-FROM cocktail c,
+insert into cocktail_ingredient (cocktail, ingredient, optional, garnish)
+select c.id, i.id, false, false
+from cocktail c,
      ingredient i
-WHERE c.name = 'Daiquiri' AND i.name = 'Lime juice';
+where c.name = 'Daiquiri' and i.name = 'Lime juice';
 
-INSERT INTO cocktail_ingredient (cocktail, ingredient, optional, garnish)
-SELECT c.id, i.id, true, true
-FROM cocktail c,
+insert into cocktail_ingredient (cocktail, ingredient, optional, garnish)
+select c.id, i.id, true, true
+from cocktail c,
      ingredient i
-WHERE c.name = 'Daiquiri' AND i.name = 'Lime';
+where c.name = 'Daiquiri' and i.name = 'Lime';
 
-INSERT INTO cocktail_ingredient (cocktail, ingredient, optional, garnish)
-SELECT c.id, i.id, false, false
-FROM cocktail c,
+insert into cocktail_ingredient (cocktail, ingredient, optional, garnish)
+select c.id, i.id, false, false
+from cocktail c,
      ingredient i
-WHERE c.name = 'Dark and Stormy' AND i.name = 'Dark rum';
+where c.name = 'Dark and Stormy' and i.name = 'Dark rum';
 
-INSERT INTO cocktail_ingredient (cocktail, ingredient, optional, garnish)
-SELECT c.id, i.id, false, false
-FROM cocktail c,
+insert into cocktail_ingredient (cocktail, ingredient, optional, garnish)
+select c.id, i.id, false, false
+from cocktail c,
      ingredient i
-WHERE c.name = 'Dark and Stormy' AND i.name = 'Ginger Beer';
+where c.name = 'Dark and Stormy' AND i.name = 'Ginger Beer';
 
-INSERT INTO cocktail_ingredient (cocktail, ingredient, optional, garnish)
-SELECT c.id, i.id, true, false
-FROM cocktail c,
+insert into cocktail_ingredient (cocktail, ingredient, optional, garnish)
+select c.id, i.id, true, false
+from cocktail c,
      ingredient i
-WHERE c.name = 'Dark and Stormy' AND i.name = 'Simple syrup';
+where c.name = 'Dark and Stormy' and i.name = 'Simple syrup';
 
-INSERT INTO cocktail_ingredient (cocktail, ingredient, optional, garnish)
-SELECT c.id, i.id, true, false
-FROM cocktail c,
+insert into cocktail_ingredient (cocktail, ingredient, optional, garnish)
+select c.id, i.id, true, false
+from cocktail c,
      ingredient i
-WHERE c.name = 'Dark and Stormy' AND i.name = 'Lime juice';
+where c.name = 'Dark and Stormy' and i.name = 'Lime juice';
 
-INSERT INTO cocktail_ingredient (cocktail, ingredient, optional, garnish)
-SELECT c.id, i.id, true, true
-FROM cocktail c,
+insert into cocktail_ingredient (cocktail, ingredient, optional, garnish)
+select c.id, i.id, true, true
+from cocktail c,
      ingredient i
-WHERE c.name = 'Dark and Stormy' AND i.name = 'Lime';
+where c.name = 'Dark and Stormy' and i.name = 'Lime';

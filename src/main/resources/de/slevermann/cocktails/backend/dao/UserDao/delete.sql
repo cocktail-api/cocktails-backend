@@ -1,3 +1,3 @@
-DELETE
-FROM "user"
-WHERE uuid = :uuid;
+delete
+from "user"
+where uuid = :uuid;

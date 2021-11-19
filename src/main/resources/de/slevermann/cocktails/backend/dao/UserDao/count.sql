@@ -1,2 +1,2 @@
-SELECT COUNT(*)
-FROM "user"
+select count(*)
+from "user";

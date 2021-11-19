@@ -1,4 +1,4 @@
-UPDATE ingredient_type
-SET name = :name
-WHERE uuid = :uuid
-RETURNING uuid AS type_uuid, name AS type_name;
+update ingredient_type
+set name = :name
+where uuid = :uuid
+returning uuid as type_uuid, name as type_name;

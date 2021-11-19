@@ -1,8 +1,8 @@
-DELETE
-FROM user_ingredient
-    USING "user" AS u,
-        ingredient AS i
-WHERE ingredient = i.id
-  AND "user" = u.id
-  AND i.uuid = :ingredient
-  AND u.uuid = :user;
+delete
+from user_ingredient
+    using "user" as u,
+        ingredient as i
+where ingredient = i.id
+  and "user" = u.id
+  and i.uuid = :ingredient
+  and u.uuid = :user;
