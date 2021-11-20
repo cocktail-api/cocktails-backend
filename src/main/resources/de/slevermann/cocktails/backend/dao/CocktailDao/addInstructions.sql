@@ -1,4 +1,4 @@
-insert into instructions (number, text, cocktail)
+insert into instruction (number, text, cocktail)
 select :number, :text, c.id
 from cocktail c
 where c.uuid = :cocktail
