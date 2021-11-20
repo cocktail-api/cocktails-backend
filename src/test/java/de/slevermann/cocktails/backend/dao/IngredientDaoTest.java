@@ -1,13 +1,19 @@
 package de.slevermann.cocktails.backend.dao;
 
-import de.slevermann.cocktails.backend.model.db.create.DbCreateIngredient;
 import de.slevermann.cocktails.backend.model.db.DbIngredient;
 import de.slevermann.cocktails.backend.model.db.DbIngredientType;
-import org.junit.jupiter.api.Disabled;
+import de.slevermann.cocktails.backend.model.db.DbUnit;
+import de.slevermann.cocktails.backend.model.db.create.DbCreateCocktail;
+import de.slevermann.cocktails.backend.model.db.create.DbCreateCocktailIngredient;
+import de.slevermann.cocktails.backend.model.db.create.DbCreateIngredient;
+import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.postgresql.util.PSQLException;
+import org.postgresql.util.PSQLState;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -15,7 +21,9 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class IngredientDaoTest extends DaoTestBase {
 
@@ -27,6 +35,9 @@ public class IngredientDaoTest extends DaoTestBase {
 
     @Autowired
     UserDao userDao;
+
+    @Autowired
+    CocktailDao cocktailDao;
 
     DbIngredientType type;
 
@@ -101,13 +112,6 @@ public class IngredientDaoTest extends DaoTestBase {
         assertEquals(1, ingredientDao.count());
     }
 
-    @Order(45)
-    @Test
-    @Disabled
-    void testUseCount() {
-
-    }
-
     @Order(50)
     @Test
     void testShelfCount() {
@@ -133,10 +137,60 @@ public class IngredientDaoTest extends DaoTestBase {
         assertEquals(0, ingredientDao.shelfCount(ingredientThree.id()));
     }
 
+    @Order(51)
+    @Test
+    void testDeleteShelfIngredient() {
+        final var ex = assertThrows(UnableToExecuteStatementException.class,
+                () -> ingredientDao.delete(ingredient.id()));
+        if (ex.getCause() instanceof PSQLException psqlException) {
+            final var state = PSQLState.FOREIGN_KEY_VIOLATION.getState();
+            assertEquals(state, psqlException.getSQLState());
+        } else {
+            fail();
+        }
+    }
+
     @Order(55)
     @Test
-    @Disabled
-    void testFindByCocktail() {
+    void testUseCount() {
+        final var firstCocktail = cocktailDao.create(
+                new DbCreateCocktail("first", "description")
+        );
+        final var secondCocktail = cocktailDao.create(
+                new DbCreateCocktail("second", "description")
+        );
+
+        assertEquals(0, ingredientDao.usedByCount(ingredient.id()));
+        assertEquals(0, ingredientDao.usedByCount(ingredientTwo.id()));
+        assertEquals(0, ingredientDao.usedByCount(ingredientThree.id()));
+
+        cocktailDao.addIngredients(firstCocktail.id(), Set.of(
+                new DbCreateCocktailIngredient(ingredient, 20d, DbUnit.milliliters,
+                        false, false),
+                new DbCreateCocktailIngredient(ingredientTwo, 30d, DbUnit.grams,
+                        true, true)
+        ));
+        cocktailDao.addIngredients(secondCocktail.id(), Set.of(
+                new DbCreateCocktailIngredient(ingredientThree, 20d, DbUnit.milliliters,
+                        false, false)
+        ));
+
+        assertEquals(1, ingredientDao.usedByCount(ingredient.id()));
+        assertEquals(1, ingredientDao.usedByCount(ingredientTwo.id()));
+        assertEquals(1, ingredientDao.usedByCount(ingredientThree.id()));
+    }
+
+    @Order(56)
+    @Test
+    void testDeleteUsed() {
+        final var ex = assertThrows(UnableToExecuteStatementException.class,
+                () -> ingredientDao.delete(ingredientThree.id()));
+        if (ex.getCause() instanceof PSQLException psqlException) {
+            final var state = PSQLState.FOREIGN_KEY_VIOLATION.getState();
+            assertEquals(state, psqlException.getSQLState());
+        } else {
+            fail();
+        }
     }
 
     @Order(60)

@@ -167,4 +167,24 @@ public class UserDaoTest extends DaoTestBase {
         assertEquals("newguy", created.nick());
         assertEquals(created, userDao.getByNick("newguy"));
     }
+
+    @Order(85)
+    @Test
+    void testDeleteShelfCascade() {
+        final var created = userDao.create("shelfUser");
+        userDao.addToShelf(created.id(), firstIngredient.id());
+
+        jdbi.useHandle(h -> {
+            final var userId = h.createQuery(
+                    "select id from \"user\" where uuid = :uuid"
+            ).bind("uuid", created.id()).mapTo(Long.class).first();
+
+            userDao.delete(created.id());
+
+            final var useCount = h.createQuery(
+                    "select count(*) from user_ingredient where \"user\" = :id"
+            ).bind("id", userId).mapTo(Long.class).first();
+            assertEquals(0, useCount);
+        });
+    }
 }

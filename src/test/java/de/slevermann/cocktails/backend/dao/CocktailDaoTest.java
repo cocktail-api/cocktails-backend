@@ -42,6 +42,8 @@ public class CocktailDaoTest extends DaoTestBase {
 
     DbCocktail firstCocktail;
 
+    long firstid;
+
     DbCocktail secondCocktail;
 
     DbIngredientType type;
@@ -117,9 +119,29 @@ public class CocktailDaoTest extends DaoTestBase {
     @Order(40)
     @Test
     void testDelete() {
+        jdbi.useHandle(h -> firstid = h.createQuery("select id from cocktail where uuid = :uuid")
+                .bind("uuid", firstCocktail.id())
+                .mapTo(Long.class).findFirst().get()
+        );
         assertEquals(1, cocktailDao.delete(firstCocktail.id()));
         assertNull(cocktailDao.getById(firstCocktail.id()));
         assertEquals(1, cocktailDao.count());
+    }
+
+    @Order(41)
+    @Test
+    void testRelationsDeleted() {
+        jdbi.useHandle(h -> {
+            final var ingredientCount = h.createQuery(
+                    "select count (*) from cocktail_ingredient where cocktail = :id"
+            ).bind("id", firstid).mapTo(Long.class).findFirst().get();
+            assertEquals(0, ingredientCount);
+
+            final var instructionCount = h.createQuery(
+                    "select count(*) from instruction where cocktail = :id"
+            ).bind("id", firstid).mapTo(Long.class).findFirst().get();
+            assertEquals(0, instructionCount);
+        });
     }
 
     @Order(45)

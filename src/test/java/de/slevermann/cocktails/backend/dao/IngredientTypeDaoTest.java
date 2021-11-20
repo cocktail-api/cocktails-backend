@@ -1,5 +1,6 @@
 package de.slevermann.cocktails.backend.dao;
 
+import de.slevermann.cocktails.backend.model.db.DbIngredientType;
 import de.slevermann.cocktails.backend.model.db.create.DbCreateIngredient;
 import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 import org.junit.jupiter.api.Order;
@@ -26,6 +27,8 @@ class IngredientTypeDaoTest extends DaoTestBase {
     IngredientDao ingredientDao;
 
     UUID createdUuid;
+
+    DbIngredientType newType;
 
     @Order(5)
     @Test
@@ -116,7 +119,7 @@ class IngredientTypeDaoTest extends DaoTestBase {
     @Order(45)
     @Test
     void testUseCount() {
-        final var newType = ingredientTypeDao.create("new");
+        newType = ingredientTypeDao.create("new");
 
         final var firstIngredient = new DbCreateIngredient(newType.id(),
                 "first", "description");
@@ -128,6 +131,19 @@ class IngredientTypeDaoTest extends DaoTestBase {
 
         assertEquals(0, ingredientTypeDao.usedByCount(createdUuid));
         assertEquals(2, ingredientTypeDao.usedByCount(newType.id()));
+    }
+
+    @Order(46)
+    @Test
+    void testDeleteReferenced() {
+        final var ex = assertThrows(UnableToExecuteStatementException.class,
+                () -> ingredientTypeDao.delete(newType.id()));
+        if (ex.getCause() instanceof PSQLException psqlException) {
+            final var state = PSQLState.FOREIGN_KEY_VIOLATION.getState();
+            assertEquals(state, psqlException.getSQLState());
+        } else {
+            fail();
+        }
     }
 
     @Order(50)
