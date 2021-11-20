@@ -65,4 +65,11 @@ public interface IngredientDao {
     @Timestamped
     DbIngredient update(@Bind("uuid") final UUID uuid,
                         @BindMethods final DbCreateIngredient ingredient);
+
+    @SqlQuery
+    @Timed(value = "ingredients.findByType",
+            description = "Performance of fetching ingredients by type",
+            percentiles = {0.99, 0.95, 0.9, 0.5})
+    List<DbIngredient> findByType(@Bind("type") final UUID type,
+                                  @Bind("offset") final int offset, @Bind("pageSize") final int pageSize);
 }

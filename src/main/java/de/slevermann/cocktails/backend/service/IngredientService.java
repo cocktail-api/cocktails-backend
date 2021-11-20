@@ -82,4 +82,14 @@ public class IngredientService {
         }
         return ingredientMapper.fromDb(updated);
     }
+
+    public List<Ingredient> findByType(final UUID type,
+                                       final int page,
+                                       final int pageSize) {
+        if (ingredientTypeDao.getById(type) == null) {
+            throw new NoSuchResourceProblem(ResourceType.INGREDIENT_TYPE, type.toString());
+        }
+        return ingredientDao.findByType(type, (page - 1) * pageSize, pageSize)
+                .stream().map(ingredientMapper::fromDb).toList();
+    }
 }

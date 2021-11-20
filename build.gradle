@@ -68,7 +68,7 @@ dependencies {
     implementation 'org.mapstruct:mapstruct:1.4.2.Final'
     implementation 'org.zalando:problem-spring-web:0.27.0'
 
-    implementation 'de.slevermann.cocktails:cocktails-api:0.0.3-SNAPSHOT'
+    implementation 'de.slevermann.cocktails:cocktails-api:0.0.4-SNAPSHOT'
 
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'

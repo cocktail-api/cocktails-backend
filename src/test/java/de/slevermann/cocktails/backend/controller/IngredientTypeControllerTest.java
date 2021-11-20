@@ -2,7 +2,9 @@ package de.slevermann.cocktails.backend.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.slevermann.cocktails.api.model.CreateIngredientType;
+import de.slevermann.cocktails.api.model.Ingredient;
 import de.slevermann.cocktails.api.model.IngredientType;
+import de.slevermann.cocktails.backend.service.IngredientService;
 import de.slevermann.cocktails.backend.service.IngredientTypeService;
 import de.slevermann.cocktails.backend.service.problem.ConflictProblem;
 import de.slevermann.cocktails.backend.service.problem.NoSuchResourceProblem;
@@ -47,6 +49,9 @@ class IngredientTypeControllerTest {
 
     @MockBean
     IngredientTypeService ingredientTypeService;
+
+    @MockBean
+    IngredientService ingredientService;
 
     @ParameterizedTest
     @ValueSource(longs = {1, 2, 5, 10, 1000, Integer.MAX_VALUE})
@@ -228,5 +233,43 @@ class IngredientTypeControllerTest {
                 .andExpect(jsonPath("$.conflictFieldValue").value(problem.getConflictFieldValue()))
                 .andExpect(jsonPath("$.resourceType").value(problem.getResourceType().getType()))
                 .andExpect(jsonPath("$.resourceId").value(problem.getResourceId()));
+    }
+
+    @Test
+    void testGetIngredients() throws Exception {
+        final var type = new IngredientType().name("type").id(UUID.randomUUID());
+        final var first = new Ingredient().id(UUID.randomUUID()).name("first").type(type).description("1desc");
+        final var second = new Ingredient().id(UUID.randomUUID()).name("second").type(type).description("2desc");
+        when(ingredientService.findByType(any(), anyInt(), anyInt())).thenReturn(
+                List.of(first, second)
+        );
+
+        mockMvc.perform(get("/types/{uuid}/ingredients", type.getId())
+                        .param("page", "1")
+                        .param("pageSize", "2"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(APPLICATION_JSON))
+                .andExpect(jsonPath("$[0].id").value(first.getId().toString()))
+                .andExpect(jsonPath("$[0].name").value(first.getName()))
+                .andExpect(jsonPath("$[0].description").value(first.getDescription()))
+                .andExpect(jsonPath("$[0].type.id").value(first.getType().getId().toString()))
+                .andExpect(jsonPath("$[1].id").value(second.getId().toString()))
+                .andExpect(jsonPath("$[1].name").value(second.getName()))
+                .andExpect(jsonPath("$[1].description").value(second.getDescription()))
+                .andExpect(jsonPath("$[1].type.id").value(second.getType().getId().toString()));
+    }
+
+    @Test
+    void testGetIngredientsMissingType() throws Exception {
+        final var id = UUID.randomUUID();
+        final var problem = new NoSuchResourceProblem(INGREDIENT_TYPE, id.toString());
+        when(ingredientService.findByType(any(), anyInt(), anyInt())).thenThrow(problem);
+
+        mockMvc.perform(get("/types/{uuid}/ingredients", id))
+                .andExpect(content().contentType(APPLICATION_PROBLEM_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.resourceType").value(problem.getResourceType().getType()))
+                .andExpect(jsonPath("$.resourceId").value(problem.getResourceId()));
+
     }
 }

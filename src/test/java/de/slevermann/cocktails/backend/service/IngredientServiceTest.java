@@ -28,6 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 
 @MockitoSettings
@@ -206,4 +207,28 @@ public class IngredientServiceTest {
         assertEquals(ex.getResourceType(), INGREDIENT);
     }
 
+    @Test
+    void testFindByType() {
+        final var type = new DbIngredientType(UUID.randomUUID(), "type");
+        when(ingredientTypeDao.getById(any())).thenReturn(type);
+        when(ingredientDao.findByType(any(), anyInt(), anyInt())).thenReturn(List.of(
+                new DbIngredient(randomUUID(), type, "name", "description"),
+                new DbIngredient(randomUUID(), type, "name", "description")
+        ));
+        when(ingredientMapper.fromDb(any())).thenReturn(new Ingredient());
+
+        assertEquals(2, ingredientService.findByType(UUID.randomUUID(), 1, 2).size());
+    }
+
+    @Test
+    void testFindByTypeMissing() {
+        when(ingredientTypeDao.getById(any())).thenReturn(null);
+
+        final var id = UUID.randomUUID();
+        final var ex = assertThrows(NoSuchResourceProblem.class,
+                () -> ingredientService.findByType(id, 1, 2));
+
+        assertEquals(id.toString(), ex.getResourceId());
+        assertEquals(INGREDIENT_TYPE, ex.getResourceType());
+    }
 }

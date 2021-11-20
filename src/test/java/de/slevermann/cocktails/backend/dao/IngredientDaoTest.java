@@ -213,4 +213,13 @@ public class IngredientDaoTest extends DaoTestBase {
                 "newName", "newDescription");
         assertNull(ingredientDao.update(UUID.randomUUID(), replacement));
     }
+
+    @Order(70)
+    @Test
+    void testFindByType() {
+        assertEquals(2, ingredientDao.findByType(type.id(), 0, 2).size());
+
+        assertEquals(1, ingredientDao.findByType(type.id(), 0, 1).size());
+        assertEquals(1, ingredientDao.findByType(type.id(), 1, 1).size());
+    }
 }
