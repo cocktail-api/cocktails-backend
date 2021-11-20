@@ -158,4 +158,25 @@ class IngredientTypeDaoTest extends DaoTestBase {
         assertEquals(type.created(), updated.created());
         assertTrue(updated.created().isBefore(updated.modified()));
     }
+
+    @Order(55)
+    @Test
+    void testFindByName() {
+        final var type = ingredientTypeDao.create("funnyName");
+
+        assertNotNull(ingredientTypeDao.findByName("funnyName"));
+        assertNotNull(ingredientTypeDao.findByName("FUnnYnamE"));
+    }
+
+    @Order(60)
+    @Test
+    void testFindByNameAndNotId() {
+        final var type = ingredientTypeDao.create("newFunnyType");
+
+        assertNotNull(ingredientTypeDao.findByNameAndNotId("newFunnyType", UUID.randomUUID()));
+        assertNotNull(ingredientTypeDao.findByNameAndNotId("newFunnyType", UUID.randomUUID()));
+
+        assertNull(ingredientTypeDao.findByNameAndNotId("newFunnyType", type.id()));
+        assertNull(ingredientTypeDao.findByNameAndNotId("newFunnyType", type.id()));
+    }
 }

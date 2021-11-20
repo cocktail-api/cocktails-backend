@@ -4,6 +4,7 @@ import de.slevermann.cocktails.api.model.IngredientType;
 import de.slevermann.cocktails.backend.dao.IngredientTypeDao;
 import de.slevermann.cocktails.backend.model.db.DbIngredientType;
 import de.slevermann.cocktails.backend.model.mapper.IngredientTypeMapper;
+import de.slevermann.cocktails.backend.service.problem.ConflictProblem;
 import de.slevermann.cocktails.backend.service.problem.NoSuchResourceProblem;
 import de.slevermann.cocktails.backend.service.problem.ReferencedEntityProblem;
 import de.slevermann.cocktails.backend.service.problem.ResourceType;
@@ -101,6 +102,68 @@ class IngredientTypeServiceTest {
         final var ex = assertThrows(ReferencedEntityProblem.class,
                 () -> service.delete(id));
 
+        assertEquals(id.toString(), ex.getResourceId());
+        assertEquals(ResourceType.INGREDIENT_TYPE, ex.getResourceType());
+    }
+
+    @Test
+    void testCreate() {
+        final var ingredientType = new IngredientType().id(UUID.randomUUID()).name("name");
+        when(dao.findByName(any())).thenReturn(null);
+        when(dao.create(any())).thenReturn(new DbIngredientType(UUID.randomUUID(), "name"));
+        when(mapper.fromDb(any())).thenReturn(ingredientType);
+
+        assertEquals(ingredientType, service.create("name"));
+    }
+
+    @Test
+    void testCreateExists() {
+        final var id = UUID.randomUUID();
+        final var name = "type";
+        when(dao.findByName(any())).thenReturn(new DbIngredientType(id, name));
+
+        final var ex = assertThrows(ConflictProblem.class,
+                () -> service.create("type"));
+        assertEquals("name", ex.getConflictFieldName());
+        assertEquals("type", ex.getConflictFieldValue());
+        assertEquals(ResourceType.INGREDIENT_TYPE, ex.getResourceType());
+        assertEquals(id.toString(), ex.getResourceId());
+    }
+
+    @Test
+    void testUpdate() {
+        final var ingredientType = new IngredientType().id(UUID.randomUUID()).name("name");
+        when(dao.findByNameAndNotId(any(), any())).thenReturn(null);
+        when(dao.update(any(), any())).thenReturn(new DbIngredientType(UUID.randomUUID(), "name"));
+        when(mapper.fromDb(any())).thenReturn(ingredientType);
+
+        assertEquals(ingredientType, service.update("name", UUID.randomUUID()));
+    }
+
+    @Test
+    void testUpdateExists() {
+        final var id = UUID.randomUUID();
+        final var name = "type";
+        when(dao.findByNameAndNotId(any(), any())).thenReturn(new DbIngredientType(id, name));
+
+        final var ex = assertThrows(ConflictProblem.class,
+                () -> service.update(name, id));
+        assertEquals("name", ex.getConflictFieldName());
+        assertEquals("type", ex.getConflictFieldValue());
+        assertEquals(ResourceType.INGREDIENT_TYPE, ex.getResourceType());
+        assertEquals(id.toString(), ex.getResourceId());
+    }
+
+    @Test
+    void testUpdateMissing() {
+        final var id = UUID.randomUUID();
+        final var name = "type";
+
+        when(dao.findByNameAndNotId(any(), any())).thenReturn(null);
+        when(dao.update(any(), any())).thenReturn(null);
+
+        final var ex = assertThrows(NoSuchResourceProblem.class,
+                () -> service.update(name, id));
         assertEquals(id.toString(), ex.getResourceId());
         assertEquals(ResourceType.INGREDIENT_TYPE, ex.getResourceType());
     }

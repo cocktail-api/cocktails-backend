@@ -60,4 +60,15 @@ public interface IngredientTypeDao {
     @Timestamped
     DbIngredientType update(@Bind("uuid") final UUID uuid, @Bind("name") final String name);
 
+    @SqlQuery
+    @Timed(value = "types.findByName",
+            description = "Performance of ingredient type name lookup",
+            percentiles = {0.99, 0.95, 0.9, 0.5})
+    DbIngredientType findByName(@Bind("name") final String name);
+
+    @SqlQuery
+    @Timed(value = "types.findByNameAndNot",
+            description = "Performance of ingredient type name and != id lookup",
+            percentiles = {0.99, 0.95, 0.9, 0.5})
+    DbIngredientType findByNameAndNotId(@Bind("name") final String name, @Bind("uuid") final UUID uuid);
 }
