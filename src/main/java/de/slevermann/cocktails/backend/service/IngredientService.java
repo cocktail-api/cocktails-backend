@@ -68,4 +68,18 @@ public class IngredientService {
         }
         return ingredientMapper.fromDb(ingredient);
     }
+
+    public Ingredient update(final CreateIngredient createIngredient,
+                             final UUID uuid) {
+        final var typeId = createIngredient.getType();
+        final var type = ingredientTypeDao.getById(typeId);
+        if (type == null) {
+            throw new MissingReferenceProblem(ResourceType.INGREDIENT_TYPE, typeId.toString());
+        }
+        final var updated = ingredientDao.update(uuid, ingredientMapper.fromApi(createIngredient));
+        if (updated == null) {
+            throw new NoSuchResourceProblem(ResourceType.INGREDIENT, uuid.toString());
+        }
+        return ingredientMapper.fromDb(updated);
+    }
 }

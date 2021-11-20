@@ -4,14 +4,13 @@ import de.slevermann.cocktails.api.model.CreateIngredient;
 import de.slevermann.cocktails.api.model.Ingredient;
 import de.slevermann.cocktails.backend.dao.IngredientDao;
 import de.slevermann.cocktails.backend.dao.IngredientTypeDao;
-import de.slevermann.cocktails.backend.model.db.create.DbCreateIngredient;
 import de.slevermann.cocktails.backend.model.db.DbIngredient;
 import de.slevermann.cocktails.backend.model.db.DbIngredientType;
+import de.slevermann.cocktails.backend.model.db.create.DbCreateIngredient;
 import de.slevermann.cocktails.backend.model.mapper.IngredientMapper;
 import de.slevermann.cocktails.backend.service.problem.MissingReferenceProblem;
 import de.slevermann.cocktails.backend.service.problem.NoSuchResourceProblem;
 import de.slevermann.cocktails.backend.service.problem.ReferencedEntityProblem;
-import de.slevermann.cocktails.backend.service.problem.ResourceType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -20,7 +19,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoSettings;
 
 import java.util.List;
+import java.util.UUID;
 
+import static de.slevermann.cocktails.backend.service.problem.ResourceType.INGREDIENT;
+import static de.slevermann.cocktails.backend.service.problem.ResourceType.INGREDIENT_TYPE;
 import static java.util.UUID.randomUUID;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -82,7 +84,7 @@ public class IngredientServiceTest {
         final var ex = assertThrows(NoSuchResourceProblem.class,
                 () -> ingredientService.get(id));
         assertEquals(id.toString(), ex.getResourceId());
-        assertEquals(ResourceType.INGREDIENT, ex.getResourceType());
+        assertEquals(INGREDIENT, ex.getResourceType());
     }
 
     @Test
@@ -105,7 +107,7 @@ public class IngredientServiceTest {
                 () -> ingredientService.delete(id));
 
         assertEquals(id.toString(), ex.getResourceId());
-        assertEquals(ResourceType.INGREDIENT, ex.getResourceType());
+        assertEquals(INGREDIENT, ex.getResourceType());
     }
 
     @Test
@@ -117,7 +119,7 @@ public class IngredientServiceTest {
                 () -> ingredientService.delete(id));
 
         assertEquals(id.toString(), ex.getResourceId());
-        assertEquals(ResourceType.INGREDIENT, ex.getResourceType());
+        assertEquals(INGREDIENT, ex.getResourceType());
     }
 
     @Test
@@ -130,7 +132,7 @@ public class IngredientServiceTest {
                 () -> ingredientService.delete(id));
 
         assertEquals(id.toString(), ex.getResourceId());
-        assertEquals(ResourceType.INGREDIENT, ex.getResourceType());
+        assertEquals(INGREDIENT, ex.getResourceType());
     }
 
     @Test
@@ -158,7 +160,50 @@ public class IngredientServiceTest {
                 () -> ingredientService.create(new CreateIngredient().type(id).name("beer").description("tasty")));
 
         assertEquals(ex.getResourceId(), id.toString());
-        assertEquals(ex.getReferencedResourceType(), ResourceType.INGREDIENT_TYPE);
+        assertEquals(ex.getReferencedResourceType(), INGREDIENT_TYPE);
+    }
+
+    @Test
+    void testUpdate() {
+        final var id = randomUUID();
+        final var type = new DbIngredientType(id, "tasty things");
+        when(ingredientTypeDao.getById(any())).thenReturn(type);
+        final var ingredient = new CreateIngredient().type(id).name("beer").description("tasty");
+        final var dbCreateIngredient = new DbCreateIngredient(id, "beer", "tasty");
+        when(ingredientMapper.fromApi(any())).thenReturn(dbCreateIngredient);
+        final var dbIngredient = new DbIngredient(randomUUID(), type, "beer", "tasty");
+        when(ingredientDao.update(any(), any())).thenReturn(dbIngredient);
+        final var finishedIngredient = new Ingredient().name("beer").description("tasty");
+        when(ingredientMapper.fromDb(any())).thenReturn(finishedIngredient);
+
+        assertEquals(finishedIngredient, ingredientService.update(ingredient, id));
+    }
+
+    @Test
+    void testUpdateMissingType() {
+        final var id = UUID.randomUUID();
+        when(ingredientTypeDao.getById(any())).thenReturn(null);
+
+        final var ex = assertThrows(MissingReferenceProblem.class,
+                () -> ingredientService.update(new CreateIngredient().type(id).name("beer").description("tasty"), id));
+
+        assertEquals(ex.getResourceId(), id.toString());
+        assertEquals(ex.getReferencedResourceType(), INGREDIENT_TYPE);
+    }
+
+    @Test
+    void testUpdateMissingIngredient() {
+        final var id = randomUUID();
+        final var type = new DbIngredientType(id, "tasty things");
+        when(ingredientTypeDao.getById(any())).thenReturn(type);
+        final var dbCreateIngredient = new DbCreateIngredient(id, "beer", "tasty");
+        when(ingredientMapper.fromApi(any())).thenReturn(dbCreateIngredient);
+        when(ingredientDao.update(any(), any())).thenReturn(null);
+
+        final var ex = assertThrows(NoSuchResourceProblem.class,
+                () -> ingredientService.update(new CreateIngredient().type(id).name("beer").description("tasty"), id));
+        assertEquals(ex.getResourceId(), id.toString());
+        assertEquals(ex.getResourceType(), INGREDIENT);
     }
 
 }

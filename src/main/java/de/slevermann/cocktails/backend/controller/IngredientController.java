@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,6 +21,9 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import java.util.List;
 import java.util.UUID;
+
+import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.fromMethodCall;
+import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.on;
 
 @RequestMapping("/ingredients")
 @RequiredArgsConstructor
@@ -41,8 +45,11 @@ public class IngredientController {
     }
 
     @PostMapping
-    public Ingredient create(@RequestBody @Valid CreateIngredient createIngredient) {
-        return ingredientService.create(createIngredient);
+    public ResponseEntity<Ingredient> create(@RequestBody @Valid CreateIngredient createIngredient) {
+        final var createdIngredient = ingredientService.create(createIngredient);
+        return ResponseEntity.created(fromMethodCall(
+                        on(IngredientController.class).getById(createdIngredient.getId())).build().toUri())
+                .body(createdIngredient);
     }
 
     @DeleteMapping("/{uuid}")
@@ -54,5 +61,11 @@ public class IngredientController {
     @GetMapping("/{uuid}")
     public Ingredient getById(@PathVariable final UUID uuid) {
         return ingredientService.get(uuid);
+    }
+
+    @PutMapping("/{uuid}")
+    public Ingredient update(@RequestBody @Valid CreateIngredient createIngredient,
+                             @PathVariable("uuid") final UUID uuid) {
+        return ingredientService.update(createIngredient, uuid);
     }
 }

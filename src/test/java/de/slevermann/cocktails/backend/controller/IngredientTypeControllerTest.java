@@ -26,6 +26,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -97,7 +98,7 @@ class IngredientTypeControllerTest {
 
         mockMvc.perform(get("/types/{uuid}", id))
                 .andExpect(status().isNotFound())
-                .andExpect(content().contentType("application/problem+json"))
+                .andExpect(content().contentType(APPLICATION_PROBLEM_JSON))
                 .andExpect(jsonPath("$.resourceType").value(problem.getResourceType().getType()))
                 .andExpect(jsonPath("$.resourceId").value(problem.getResourceId()));
     }
@@ -119,7 +120,7 @@ class IngredientTypeControllerTest {
 
         mockMvc.perform(delete("/types/{uuid}", id))
                 .andExpect(status().isNotFound())
-                .andExpect(content().contentType("application/problem+json"))
+                .andExpect(content().contentType(APPLICATION_PROBLEM_JSON))
                 .andExpect(jsonPath("$.resourceType").value(problem.getResourceType().getType()))
                 .andExpect(jsonPath("$.resourceId").value(problem.getResourceId()));
     }
@@ -132,7 +133,7 @@ class IngredientTypeControllerTest {
 
         mockMvc.perform(delete("/types/{uuid}", id))
                 .andExpect(status().isUnprocessableEntity())
-                .andExpect(content().contentType("application/problem+json"))
+                .andExpect(content().contentType(APPLICATION_PROBLEM_JSON))
                 .andExpect(jsonPath("$.resourceType").value(problem.getResourceType().getType()))
                 .andExpect(jsonPath("$.resourceId").value(problem.getResourceId()));
     }
@@ -140,12 +141,12 @@ class IngredientTypeControllerTest {
     @Test
     void testCreate() throws Exception {
         final var id = UUID.randomUUID();
-        final var ingredient = new CreateIngredientType().name("test");
+        final var ingredientType = new CreateIngredientType().name("test");
         when(ingredientTypeService.create(any())).thenReturn(new IngredientType().id(id).name("test"));
 
         mockMvc.perform(post("/types")
                         .contentType(APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsBytes(ingredient)))
+                        .content(objectMapper.writeValueAsBytes(ingredientType)))
                 .andExpect(content().contentType(APPLICATION_JSON))
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", new StringEndsWith(id.toString())))
@@ -166,7 +167,7 @@ class IngredientTypeControllerTest {
         mockMvc.perform(post("/types")
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsBytes(ingredient)))
-                .andExpect(content().contentType("application/problem+json"))
+                .andExpect(content().contentType(APPLICATION_PROBLEM_JSON))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.conflictFieldName").value(problem.getConflictFieldName()))
                 .andExpect(jsonPath("$.conflictFieldValue").value(problem.getConflictFieldValue()))
@@ -202,7 +203,7 @@ class IngredientTypeControllerTest {
         mockMvc.perform(put("/types/{uuid}", id)
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsBytes(ingredient)))
-                .andExpect(content().contentType("application/problem+json"))
+                .andExpect(content().contentType(APPLICATION_PROBLEM_JSON))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.resourceType").value(problem.getResourceType().getType()))
                 .andExpect(jsonPath("$.resourceId").value(problem.getResourceId()));
@@ -221,7 +222,7 @@ class IngredientTypeControllerTest {
         mockMvc.perform(put("/types/{uuid}", id)
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsBytes(ingredient)))
-                .andExpect(content().contentType("application/problem+json"))
+                .andExpect(content().contentType(APPLICATION_PROBLEM_JSON))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.conflictFieldName").value(problem.getConflictFieldName()))
                 .andExpect(jsonPath("$.conflictFieldValue").value(problem.getConflictFieldValue()))

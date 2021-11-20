@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import java.util.List;
@@ -55,7 +56,7 @@ public class IngredientTypeController {
     }
 
     @PostMapping
-    public ResponseEntity<IngredientType> create(@RequestBody final CreateIngredientType type) {
+    public ResponseEntity<IngredientType> create(@RequestBody @Valid final CreateIngredientType type) {
         final var createdType = typeService.create(type.getName());
         return ResponseEntity.created(fromMethodCall(
                         on(IngredientTypeController.class).get(createdType.getId())).build().toUri())
@@ -63,8 +64,8 @@ public class IngredientTypeController {
     }
 
     @PutMapping("/{uuid}")
-    public IngredientType update(@RequestBody final String name,
+    public IngredientType update(@RequestBody @Valid final CreateIngredientType type,
                                  @PathVariable("uuid") final UUID uuid) {
-        return typeService.update(name, uuid);
+        return typeService.update(type.getName(), uuid);
     }
 }
