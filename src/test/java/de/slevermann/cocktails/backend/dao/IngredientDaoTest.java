@@ -15,6 +15,7 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class IngredientDaoTest extends DaoTestBase {
 
@@ -147,6 +148,8 @@ public class IngredientDaoTest extends DaoTestBase {
         assertEquals(newIngredient, ingredientDao.getById(ingredient.id()));
         assertEquals("newName", newIngredient.name());
         assertEquals("newDescription", newIngredient.description());
+        assertEquals(ingredient.created(), newIngredient.created());
+        assertTrue(newIngredient.created().isBefore(newIngredient.modified()));
     }
 
     @Order(65)

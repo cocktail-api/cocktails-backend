@@ -7,6 +7,7 @@ import org.jdbi.v3.core.statement.StatementContext;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @JdbiRowMapper
@@ -20,6 +21,8 @@ public class IngredientMapper implements RowMapper<DbIngredient> {
         return new DbIngredient(rs.getObject("ingredient_uuid", UUID.class),
                 ingredientTypeMapper.map(rs, ctx),
                 rs.getString("ingredient_name"),
-                rs.getString("ingredient_description"));
+                rs.getString("ingredient_description"),
+                rs.getObject("ingredient_created", OffsetDateTime.class),
+                rs.getObject("ingredient_modified", OffsetDateTime.class));
     }
 }
