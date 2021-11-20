@@ -109,6 +109,7 @@ public class CocktailDaoTest extends DaoTestBase {
         assertEquals("newName", updated.name());
         assertEquals("newDescription", updated.description());
         assertEquals(updated, cocktailDao.getById(firstCocktail.id()));
+        assertEquals(firstCocktail.created(), updated.created());
         assertTrue(updated.created().isBefore(updated.modified()));
         firstCocktail = updated;
     }

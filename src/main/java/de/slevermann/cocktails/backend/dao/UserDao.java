@@ -4,6 +4,7 @@ import de.slevermann.cocktails.backend.model.db.DbIngredient;
 import de.slevermann.cocktails.backend.model.db.DbUser;
 import io.micrometer.core.annotation.Timed;
 import org.jdbi.v3.sqlobject.customizer.Bind;
+import org.jdbi.v3.sqlobject.customizer.Timestamped;
 import org.jdbi.v3.sqlobject.locator.UseClasspathSqlLocator;
 import org.jdbi.v3.sqlobject.statement.GetGeneratedKeys;
 import org.jdbi.v3.sqlobject.statement.SqlBatch;
@@ -39,6 +40,7 @@ public interface UserDao {
     @Timed(value = "users.update",
             description = "Performance of user update",
             percentiles = {0.99, 0.95, 0.9, 0.5})
+    @Timestamped
     DbUser update(@Bind("uuid") final UUID uuid, @Bind("nick") final String nick);
 
     @SqlUpdate

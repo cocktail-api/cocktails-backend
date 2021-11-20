@@ -15,6 +15,7 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class UserDaoTest extends DaoTestBase {
 
@@ -50,10 +51,13 @@ public class UserDaoTest extends DaoTestBase {
 
     @Order(15)
     @Test
-    void testSetNick() {
+    void testUpdate() {
         assertNull(first.nick());
-        first = userDao.update(first.id(), "hello");
-        assertEquals("hello", first.nick());
+        final var updated = userDao.update(first.id(), "hello");
+        assertEquals("hello", updated.nick());
+        assertEquals(first.created(), updated.created());
+        assertTrue(updated.created().isBefore(updated.modified()));
+        first = updated;
     }
 
     @Order(20)

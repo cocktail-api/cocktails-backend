@@ -6,6 +6,7 @@ import org.jdbi.v3.core.statement.StatementContext;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @JdbiRowMapper
@@ -14,6 +15,8 @@ public class UserMapper implements RowMapper<DbUser> {
     @Override
     public DbUser map(ResultSet rs, StatementContext ctx) throws SQLException {
         return new DbUser(rs.getObject("user_uuid", UUID.class),
-                rs.getString("user_nick"));
+                rs.getString("user_nick"),
+                rs.getObject("user_created", OffsetDateTime.class),
+                rs.getObject("user_modified", OffsetDateTime.class));
     }
 }
