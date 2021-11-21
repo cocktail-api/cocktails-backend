@@ -3,6 +3,7 @@ package de.slevermann.cocktails.backend.service;
 import de.slevermann.cocktails.api.model.Cocktail;
 import de.slevermann.cocktails.api.model.CocktailListEntry;
 import de.slevermann.cocktails.backend.dao.CocktailDao;
+import de.slevermann.cocktails.backend.dao.IngredientDao;
 import de.slevermann.cocktails.backend.model.mapper.CocktailMapper;
 import de.slevermann.cocktails.backend.service.problem.NoSuchResourceProblem;
 import de.slevermann.cocktails.backend.service.problem.ResourceType;
@@ -19,6 +20,8 @@ import java.util.UUID;
 public class CocktailService {
 
     private final CocktailDao cocktailDao;
+
+    private final IngredientDao ingredientDao;
 
     private final CocktailMapper cocktailMapper;
 
@@ -41,5 +44,14 @@ public class CocktailService {
 
     public long count() {
         return cocktailDao.count();
+    }
+
+    public List<CocktailListEntry> findByIngredient(final int page, final int pageSize, final UUID uuid) {
+        if (ingredientDao.getById(uuid) == null) {
+            throw new NoSuchResourceProblem(ResourceType.INGREDIENT, uuid.toString());
+        }
+
+        return cocktailDao.findByIngredient((page - 1) * pageSize, pageSize, uuid)
+                .stream().map(cocktailMapper::fromDb).toList();
     }
 }

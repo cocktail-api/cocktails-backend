@@ -1,7 +1,9 @@
 package de.slevermann.cocktails.backend.controller;
 
+import de.slevermann.cocktails.api.model.CocktailListEntry;
 import de.slevermann.cocktails.api.model.CreateIngredient;
 import de.slevermann.cocktails.api.model.Ingredient;
+import de.slevermann.cocktails.backend.service.CocktailService;
 import de.slevermann.cocktails.backend.service.IngredientService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -33,10 +35,19 @@ public class IngredientController {
 
     private final IngredientService ingredientService;
 
+    private final CocktailService cocktailService;
+
     @GetMapping
     public List<Ingredient> getAll(@RequestParam(name = "page", defaultValue = "1") @Min(1) final int page,
                                    @RequestParam(name = "pageSize", defaultValue = "10") @Min(1) @Max(50) final int pageSize) {
         return ingredientService.ingredients(page, pageSize);
+    }
+
+    @GetMapping("/{uuid}/cocktails")
+    public List<CocktailListEntry> getByIngredient(@RequestParam(name = "page", defaultValue = "1") @Min(1) final int page,
+                                                   @RequestParam(name = "pageSize", defaultValue = "10") @Min(1) @Max(50) final int pageSize,
+                                                   @PathVariable("uuid") final UUID uuid) {
+        return cocktailService.findByIngredient(page, pageSize, uuid);
     }
 
     @GetMapping("/count")

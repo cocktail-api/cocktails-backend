@@ -291,4 +291,29 @@ public class CocktailDaoTest extends DaoTestBase {
         }
         assertEquals(numbers.size(), cocktailDao.clearInstructions(secondCocktail.id()));
     }
+
+    @Order(95)
+    @Test
+    void testFindByIngredient() {
+        final var ingredient = ingredientDao.create(
+                new DbCreateIngredient(type.id(), "verynewname", "newdescription")
+        );
+
+        final var first = new DbCreateCocktail("firstFindBy", "firstDesc");
+        final var second = new DbCreateCocktail("secondFindBy", "secondDesc");
+        final var firstCocktail = cocktailDao.create(first);
+        final var secondCocktail = cocktailDao.create(second);
+
+        cocktailDao.addIngredient(firstCocktail.id(), new DbCreateCocktailIngredient(
+                ingredient, 20d, null, false, false
+        ));
+        cocktailDao.addIngredient(secondCocktail.id(), new DbCreateCocktailIngredient(
+                ingredient, 30d, null, false, false
+        ));
+
+        assertEquals(2, cocktailDao.findByIngredient(0, 2, ingredient.id()).size());
+
+        assertEquals(1, cocktailDao.findByIngredient(0, 1, ingredient.id()).size());
+        assertEquals(1, cocktailDao.findByIngredient(1, 1, ingredient.id()).size());
+    }
 }

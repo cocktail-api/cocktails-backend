@@ -3,6 +3,7 @@ package de.slevermann.cocktails.backend.service;
 import de.slevermann.cocktails.api.model.Cocktail;
 import de.slevermann.cocktails.api.model.CocktailListEntry;
 import de.slevermann.cocktails.backend.dao.CocktailDao;
+import de.slevermann.cocktails.backend.dao.IngredientDao;
 import de.slevermann.cocktails.backend.model.db.DbCocktail;
 import de.slevermann.cocktails.backend.model.db.DbCocktailIngredient;
 import de.slevermann.cocktails.backend.model.db.DbIngredient;
@@ -20,10 +21,12 @@ import org.mockito.junit.jupiter.MockitoSettings;
 
 import java.util.List;
 
+import static de.slevermann.cocktails.backend.service.problem.ResourceType.INGREDIENT;
 import static java.util.UUID.randomUUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 
 @MockitoSettings
@@ -31,6 +34,9 @@ public class CocktailServiceTest {
 
     @Mock
     private CocktailDao cocktailDao;
+
+    @Mock
+    private IngredientDao ingredientDao;
 
     @Mock
     private CocktailMapper cocktailMapper;
@@ -90,4 +96,31 @@ public class CocktailServiceTest {
         assertEquals(ex.getResourceId(), id.toString());
     }
 
+    @Test
+    void testFindByIngredient() {
+        final var type = new DbIngredientType(randomUUID(), "type");
+        final var dbIngredient = new DbIngredient(randomUUID(), type, "ingredientName", "ingredientDescription");
+
+        when(ingredientDao.getById(any())).thenReturn(dbIngredient);
+
+        final var first = new DbCocktail(randomUUID(), "nameOne", "descriptionOne");
+        final var second = new DbCocktail(randomUUID(), "nameTwo", "descriptionTwo");
+        when(cocktailDao.findByIngredient(anyInt(), anyInt(), any())).thenReturn(List.of(
+                first, second
+        ));
+
+        assertEquals(2, cocktailService.findByIngredient(1, 2, randomUUID()).size());
+    }
+
+    @Test
+    void testFindByIngredientMissing() {
+        when(ingredientDao.getById(any())).thenReturn(null);
+
+        final var id = randomUUID();
+        final var ex = assertThrows(NoSuchResourceProblem.class,
+                () -> cocktailService.findByIngredient(1, 2, id));
+
+        assertEquals(id.toString(), ex.getResourceId());
+        assertEquals(INGREDIENT, ex.getResourceType());
+    }
 }

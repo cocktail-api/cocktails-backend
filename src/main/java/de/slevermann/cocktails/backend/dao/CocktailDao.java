@@ -109,4 +109,12 @@ public interface CocktailDao {
             description = "Performance of cocktail instruction clearing",
             percentiles = {0.99, 0.95, 0.9, 0.5})
     int clearInstructions(@Bind("cocktail") final UUID cocktail);
+
+    @SqlQuery
+    @Timed(value = "cocktails.getByIngredient",
+            description = "Performance of cocktail fetch by ingredient",
+            percentiles = {0.99, 0.95, 0.9, 0.5})
+    List<DbCocktail> findByIngredient(@Bind("offset") final int offset,
+                                      @Bind("pageSize") final int pageSize,
+                                      @Bind("uuid") final UUID uuid);
 }

@@ -1,9 +1,11 @@
 package de.slevermann.cocktails.backend.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.slevermann.cocktails.api.model.CocktailListEntry;
 import de.slevermann.cocktails.api.model.CreateIngredient;
 import de.slevermann.cocktails.api.model.Ingredient;
 import de.slevermann.cocktails.api.model.IngredientType;
+import de.slevermann.cocktails.backend.service.CocktailService;
 import de.slevermann.cocktails.backend.service.IngredientService;
 import de.slevermann.cocktails.backend.service.problem.MissingReferenceProblem;
 import de.slevermann.cocktails.backend.service.problem.NoSuchResourceProblem;
@@ -48,6 +50,9 @@ public class IngredientControllerTest {
 
     @MockBean
     IngredientService ingredientService;
+
+    @MockBean
+    CocktailService cocktailService;
 
     @ParameterizedTest
     @ValueSource(longs = {1, 2, 5, 10, 1000, Integer.MAX_VALUE})
@@ -237,6 +242,48 @@ public class IngredientControllerTest {
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.resourceType")
                         .value(problem.getResourceType().getType()))
+                .andExpect(jsonPath("$.resourceId").value(problem.getResourceId()));
+    }
+
+    @Test
+    void testGetCocktails() throws Exception {
+        final var first = new CocktailListEntry()
+                .name("Daiquiri")
+                .description("Sour rum cocktail")
+                .id(UUID.randomUUID());
+        final var second = new CocktailListEntry()
+                .name("Old Fashioned")
+                .description("The classic")
+                .id(UUID.randomUUID());
+        when(cocktailService.findByIngredient(anyInt(), anyInt(), any())).thenReturn(
+                List.of(first, second)
+        );
+
+        mockMvc.perform(get("/ingredients/{uuid}/cocktails", UUID.randomUUID())
+                        .param("page", "1")
+                        .param("pageSize", "2"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(APPLICATION_JSON))
+                .andExpect(jsonPath("$[0].name").value(first.getName()))
+                .andExpect(jsonPath("$[0].description").value(first.getDescription()))
+                .andExpect(jsonPath("$[0].id").value(first.getId().toString()))
+                .andExpect(jsonPath("$[1].name").value(second.getName()))
+                .andExpect(jsonPath("$[1].description").value(second.getDescription()))
+                .andExpect(jsonPath("$[1].id").value(second.getId().toString()));
+    }
+
+    @Test
+    void testGetCocktailsMissing() throws Exception {
+        final var id = UUID.randomUUID();
+        final var problem = new NoSuchResourceProblem(ResourceType.INGREDIENT, id.toString());
+        when(cocktailService.findByIngredient(anyInt(), anyInt(), any())).thenThrow(problem);
+
+        mockMvc.perform(get("/ingredients/{uuid}/cocktails", UUID.randomUUID())
+                        .param("page", "1")
+                        .param("pageSize", "2"))
+                .andExpect(content().contentType(APPLICATION_PROBLEM_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.resourceType").value(problem.getResourceType().getType()))
                 .andExpect(jsonPath("$.resourceId").value(problem.getResourceId()));
     }
 }
