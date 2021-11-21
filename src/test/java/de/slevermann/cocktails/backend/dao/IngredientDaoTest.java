@@ -13,11 +13,12 @@ import org.postgresql.util.PSQLException;
 import org.postgresql.util.PSQLState;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.util.UUID.randomUUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -75,7 +76,7 @@ public class IngredientDaoTest extends DaoTestBase {
     @Order(20)
     @Test
     void testGetByIdMissing() {
-        assertNull(ingredientDao.getById(UUID.randomUUID()));
+        assertNull(ingredientDao.getById(randomUUID()));
     }
 
     @Order(25)
@@ -108,7 +109,7 @@ public class IngredientDaoTest extends DaoTestBase {
     @Order(40)
     @Test
     void testDeleteMissing() {
-        assertEquals(0, ingredientDao.delete(UUID.randomUUID()));
+        assertEquals(0, ingredientDao.delete(randomUUID()));
         assertEquals(1, ingredientDao.count());
     }
 
@@ -164,13 +165,13 @@ public class IngredientDaoTest extends DaoTestBase {
         assertEquals(0, ingredientDao.usedByCount(ingredientTwo.id()));
         assertEquals(0, ingredientDao.usedByCount(ingredientThree.id()));
 
-        cocktailDao.addIngredients(firstCocktail.id(), Set.of(
+        cocktailDao.addIngredients(firstCocktail.id(), List.of(
                 new DbCreateCocktailIngredient(ingredient, 20d, DbUnit.milliliters,
                         false, false),
                 new DbCreateCocktailIngredient(ingredientTwo, 30d, DbUnit.grams,
                         true, true)
         ));
-        cocktailDao.addIngredients(secondCocktail.id(), Set.of(
+        cocktailDao.addIngredients(secondCocktail.id(), List.of(
                 new DbCreateCocktailIngredient(ingredientThree, 20d, DbUnit.milliliters,
                         false, false)
         ));
@@ -211,7 +212,7 @@ public class IngredientDaoTest extends DaoTestBase {
     void testUpdateMissing() {
         final var replacement = new DbCreateIngredient(type.id(),
                 "newName", "newDescription");
-        assertNull(ingredientDao.update(UUID.randomUUID(), replacement));
+        assertNull(ingredientDao.update(randomUUID(), replacement));
     }
 
     @Order(70)
@@ -221,5 +222,19 @@ public class IngredientDaoTest extends DaoTestBase {
 
         assertEquals(1, ingredientDao.findByType(type.id(), 0, 1).size());
         assertEquals(1, ingredientDao.findByType(type.id(), 1, 1).size());
+    }
+
+    @Order(75)
+    @Test
+    void testFindIngredients() {
+        assertEquals(2, ingredientDao.findIngredients(Set.of(
+                ingredient.id(), ingredientTwo.id()
+        )).size());
+        assertEquals(2, ingredientDao.findIngredients(Set.of(
+                ingredient.id(), ingredientTwo.id(), randomUUID()
+        )).size());
+        assertEquals(0, ingredientDao.findIngredients(Set.of(
+                randomUUID(), randomUUID()
+        )).size());
     }
 }

@@ -1,13 +1,13 @@
 package de.slevermann.cocktails.backend.dao;
 
 import de.slevermann.cocktails.backend.model.db.DbCocktail;
+import de.slevermann.cocktails.backend.model.db.DbIngredient;
+import de.slevermann.cocktails.backend.model.db.DbIngredientType;
+import de.slevermann.cocktails.backend.model.db.DbInstruction;
 import de.slevermann.cocktails.backend.model.db.create.DbCreateCocktail;
 import de.slevermann.cocktails.backend.model.db.create.DbCreateCocktailIngredient;
 import de.slevermann.cocktails.backend.model.db.create.DbCreateIngredient;
 import de.slevermann.cocktails.backend.model.db.create.DbCreateInstruction;
-import de.slevermann.cocktails.backend.model.db.DbIngredient;
-import de.slevermann.cocktails.backend.model.db.DbIngredientType;
-import de.slevermann.cocktails.backend.model.db.DbInstruction;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
@@ -53,10 +54,6 @@ public class CocktailDaoTest extends DaoTestBase {
     DbIngredient secondIngredient;
 
     DbIngredient thirdIngredient;
-
-    DbInstruction firstInstruction;
-
-    DbInstruction secondInstruction;
 
     @Order(5)
     @Test
@@ -163,7 +160,7 @@ public class CocktailDaoTest extends DaoTestBase {
                 "third", "thirdDescription"));
         firstCocktail = cocktailDao.create(new DbCreateCocktail("cocktail", "description"));
 
-        cocktailDao.addIngredients(firstCocktail.id(), Set.of(
+        cocktailDao.addIngredients(firstCocktail.id(), List.of(
                 new DbCreateCocktailIngredient(firstIngredient, 1.0d, grams, false, false),
                 new DbCreateCocktailIngredient(secondIngredient, 20d, milliliters, false, false)
         ));
@@ -240,10 +237,6 @@ public class CocktailDaoTest extends DaoTestBase {
                 new DbCreateInstruction("do another thing", 200)
         ));
         assertEquals(2, instructions.size());
-        for (final var i : instructions) {
-            if (i.number() == 100) firstInstruction = i;
-            else secondInstruction = i;
-        }
     }
 
     @Order(80)

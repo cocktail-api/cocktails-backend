@@ -74,10 +74,10 @@ public interface CocktailDao {
             description = "Performance of cocktail ingredient adding",
             percentiles = {0.99, 0.95, 0.9, 0.5})
     @Timestamped
-    void addIngredients(@Bind("cocktail") final UUID cocktail, @BindMethods final Set<DbCreateCocktailIngredient> ingredients);
+    void addIngredients(@Bind("cocktail") final UUID cocktail, @BindMethods final List<DbCreateCocktailIngredient> ingredients);
 
     default void addIngredient(final UUID cocktail, final DbCreateCocktailIngredient ingredient) {
-        addIngredients(cocktail, Set.of(ingredient));
+        addIngredients(cocktail, List.of(ingredient));
     }
 
     @SqlBatch
@@ -96,7 +96,7 @@ public interface CocktailDao {
             description = "Performance of cocktail instruction creation",
             percentiles = {0.99, 0.95, 0.9, 0.5})
     @Timestamped
-    Set<DbInstruction> addInstructions(@Bind("cocktail") final UUID cocktail, @BindMethods final Set<DbCreateInstruction> instructions);
+    List<DbInstruction> addInstructions(@Bind("cocktail") final UUID cocktail, @BindMethods final Set<DbCreateInstruction> instructions);
 
     @SqlQuery
     @Timed(value = "cocktails.getInstructions",

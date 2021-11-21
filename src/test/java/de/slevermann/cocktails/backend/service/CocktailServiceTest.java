@@ -80,7 +80,7 @@ public class CocktailServiceTest {
         when(cocktailDao.getIngredients(id)).thenReturn(ingredients);
         final var apiCocktail = new Cocktail()
                 .id(id).name("name").description("description");
-        when(cocktailMapper.fromDb(any(), any())).thenReturn(apiCocktail);
+        when(cocktailMapper.fromDb(any(), any(), any())).thenReturn(apiCocktail);
 
         assertEquals(apiCocktail, cocktailService.cocktail(id));
     }
