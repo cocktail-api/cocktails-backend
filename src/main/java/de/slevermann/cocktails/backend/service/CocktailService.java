@@ -1,9 +1,9 @@
 package de.slevermann.cocktails.backend.service;
 
 import de.slevermann.cocktails.api.model.Cocktail;
-import de.slevermann.cocktails.api.model.CocktailListEntry;
 import de.slevermann.cocktails.api.model.CreateCocktail;
 import de.slevermann.cocktails.api.model.CreateCocktailIngredient;
+import de.slevermann.cocktails.api.model.PagedCocktails;
 import de.slevermann.cocktails.backend.dao.CocktailDao;
 import de.slevermann.cocktails.backend.dao.IngredientDao;
 import de.slevermann.cocktails.backend.model.db.DbCocktailIngredient;
@@ -35,9 +35,18 @@ public class CocktailService {
 
     private final CocktailMapper cocktailMapper;
 
-    public List<CocktailListEntry> cocktails(final int page, final int pageSize) {
-        return cocktailDao.getAll((page - 1) * pageSize, pageSize)
+    public PagedCocktails cocktails(final int page, final int pageSize) {
+        final var cocktails = cocktailDao.getAll((page - 1) * pageSize, pageSize)
                 .stream().map(cocktailMapper::fromDb).toList();
+        final var count = count();
+        var totalPages = count / pageSize;
+        if (count % pageSize != 0) {
+            totalPages++;
+        }
+        return new PagedCocktails()
+                .cocktails(cocktails)
+                .total(count)
+                .lastPage(totalPages);
     }
 
     public Cocktail cocktail(final UUID uuid) {
@@ -56,13 +65,22 @@ public class CocktailService {
         return cocktailDao.count();
     }
 
-    public List<CocktailListEntry> findByIngredient(final int page, final int pageSize, final UUID uuid) {
+    public PagedCocktails findByIngredient(final int page, final int pageSize, final UUID uuid) {
         if (ingredientDao.getById(uuid) == null) {
             throw new NoSuchResourceProblem(ResourceType.INGREDIENT, uuid.toString());
         }
 
-        return cocktailDao.findByIngredient((page - 1) * pageSize, pageSize, uuid)
+        final var cocktails = cocktailDao.findByIngredient((page - 1) * pageSize, pageSize, uuid)
                 .stream().map(cocktailMapper::fromDb).toList();
+        final var count = cocktailDao.countByIngredient(uuid);
+        var totalPages = count / pageSize;
+        if (count % pageSize != 0) {
+            totalPages++;
+        }
+        return new PagedCocktails()
+                .cocktails(cocktails)
+                .total(count)
+                .lastPage(totalPages);
     }
 
     public Cocktail create(final CreateCocktail cocktail) {

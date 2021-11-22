@@ -1,6 +1,7 @@
 package de.slevermann.cocktails.backend.service;
 
 import de.slevermann.cocktails.api.model.IngredientType;
+import de.slevermann.cocktails.api.model.PagedTypes;
 import de.slevermann.cocktails.backend.dao.IngredientTypeDao;
 import de.slevermann.cocktails.backend.model.mapper.IngredientTypeMapper;
 import de.slevermann.cocktails.backend.service.problem.ConflictProblem;
@@ -11,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -23,9 +23,18 @@ public class IngredientTypeService {
 
     private final IngredientTypeMapper typeMapper;
 
-    public List<IngredientType> types(final int page, final int pageSize) {
-        return ingredientTypeDao.getAll((page - 1) * pageSize, pageSize)
+    public PagedTypes types(final int page, final int pageSize) {
+        final var types = ingredientTypeDao.getAll((page - 1) * pageSize, pageSize)
                 .stream().map(typeMapper::fromDb).toList();
+        final var count = count();
+        var totalPages = count / pageSize;
+        if (count % pageSize != 0) {
+            totalPages++;
+        }
+        return new PagedTypes()
+                .types(types)
+                .total(count)
+                .lastPage(totalPages);
     }
 
     public long count() {

@@ -51,8 +51,27 @@ class IngredientTypeServiceTest {
                 new DbIngredientType(UUID.randomUUID(), "name")
         ));
         when(mapper.fromDb(any())).thenReturn(new IngredientType());
+        when(dao.count()).thenReturn(3L);
 
-        assertEquals(2, service.types(1, 2).size());
+        final var types = service.types(1, 2);
+        assertEquals(2, types.getTypes().size());
+        assertEquals(3, types.getTotal());
+        assertEquals(2, types.getLastPage());
+    }
+
+    @Test
+    void testTypeListEven() {
+        when(dao.getAll(0, 2)).thenReturn(List.of(
+                new DbIngredientType(UUID.randomUUID(), "name"),
+                new DbIngredientType(UUID.randomUUID(), "name")
+        ));
+        when(mapper.fromDb(any())).thenReturn(new IngredientType());
+        when(dao.count()).thenReturn(4L);
+
+        final var types = service.types(1, 2);
+        assertEquals(2, types.getTypes().size());
+        assertEquals(4, types.getTotal());
+        assertEquals(2, types.getLastPage());
     }
 
     @Test

@@ -1,8 +1,9 @@
 package de.slevermann.cocktails.backend.controller;
 
 import de.slevermann.cocktails.api.model.CreateIngredientType;
-import de.slevermann.cocktails.api.model.Ingredient;
 import de.slevermann.cocktails.api.model.IngredientType;
+import de.slevermann.cocktails.api.model.PagedIngredients;
+import de.slevermann.cocktails.api.model.PagedTypes;
 import de.slevermann.cocktails.backend.service.IngredientService;
 import de.slevermann.cocktails.backend.service.IngredientTypeService;
 import lombok.RequiredArgsConstructor;
@@ -38,14 +39,14 @@ public class IngredientTypeController {
     private final IngredientService ingredientService;
 
     @GetMapping
-    public List<IngredientType> getAll(@RequestParam(name = "page", defaultValue = "1") @Min(1) final int page,
-                                       @RequestParam(name = "pageSize", defaultValue = "10") @Min(1) @Max(50) final int pageSize) {
+    public PagedTypes getAll(@RequestParam(name = "page", defaultValue = "1") @Min(1) final int page,
+                             @RequestParam(name = "pageSize", defaultValue = "20") @Min(1) @Max(50) final int pageSize) {
         return typeService.types(page, pageSize);
     }
 
     @GetMapping("/{uuid}/ingredients")
-    public List<Ingredient> getIngredients(@RequestParam(name = "page", defaultValue = "1") @Min(1) final int page,
-                                           @RequestParam(name = "pageSize", defaultValue = "10") @Min(1) @Max(50) final int pageSize,
+    public PagedIngredients getIngredients(@RequestParam(name = "page", defaultValue = "1") @Min(1) final int page,
+                                           @RequestParam(name = "pageSize", defaultValue = "20") @Min(1) @Max(50) final int pageSize,
                                            @PathVariable("uuid") final UUID uuid) {
         return ingredientService.findByType(uuid, page, pageSize);
     }

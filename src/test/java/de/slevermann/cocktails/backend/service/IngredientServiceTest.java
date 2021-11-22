@@ -63,8 +63,26 @@ public class IngredientServiceTest {
                 new DbIngredient(randomUUID(), type, "name", "description")
         ));
         when(ingredientMapper.fromDb(any())).thenReturn(new Ingredient());
+        when(ingredientDao.count()).thenReturn(3L);
+        final var pagedIngredients = ingredientService.ingredients(1, 2);
+        assertEquals(2, pagedIngredients.getIngredients().size());
+        assertEquals(3, pagedIngredients.getTotal());
+        assertEquals(2, pagedIngredients.getLastPage());
+    }
 
-        assertEquals(2, ingredientService.ingredients(1, 2).size());
+    @Test
+    void testListEven() {
+        final var type = new DbIngredientType(randomUUID(), "name");
+        when(ingredientDao.getAll(0, 2)).thenReturn(List.of(
+                new DbIngredient(randomUUID(), type, "name", "description"),
+                new DbIngredient(randomUUID(), type, "name", "description")
+        ));
+        when(ingredientMapper.fromDb(any())).thenReturn(new Ingredient());
+        when(ingredientDao.count()).thenReturn(4L);
+        final var pagedIngredients = ingredientService.ingredients(1, 2);
+        assertEquals(2, pagedIngredients.getIngredients().size());
+        assertEquals(4, pagedIngredients.getTotal());
+        assertEquals(2, pagedIngredients.getLastPage());
     }
 
     @Test
@@ -216,8 +234,27 @@ public class IngredientServiceTest {
                 new DbIngredient(randomUUID(), type, "name", "description")
         ));
         when(ingredientMapper.fromDb(any())).thenReturn(new Ingredient());
+        when(ingredientDao.countByType(any())).thenReturn(3L);
+        final var pagedIngredients = ingredientService.findByType(UUID.randomUUID(), 1, 2);
+        assertEquals(2, pagedIngredients.getIngredients().size());
+        assertEquals(3, pagedIngredients.getTotal());
+        assertEquals(2, pagedIngredients.getLastPage());
+    }
 
-        assertEquals(2, ingredientService.findByType(UUID.randomUUID(), 1, 2).size());
+    @Test
+    void testFindByTypeEven() {
+        final var type = new DbIngredientType(UUID.randomUUID(), "type");
+        when(ingredientTypeDao.getById(any())).thenReturn(type);
+        when(ingredientDao.findByType(any(), anyInt(), anyInt())).thenReturn(List.of(
+                new DbIngredient(randomUUID(), type, "name", "description"),
+                new DbIngredient(randomUUID(), type, "name", "description")
+        ));
+        when(ingredientMapper.fromDb(any())).thenReturn(new Ingredient());
+        when(ingredientDao.countByType(any())).thenReturn(4L);
+        final var pagedIngredients = ingredientService.findByType(UUID.randomUUID(), 1, 2);
+        assertEquals(2, pagedIngredients.getIngredients().size());
+        assertEquals(4, pagedIngredients.getTotal());
+        assertEquals(2, pagedIngredients.getLastPage());
     }
 
     @Test

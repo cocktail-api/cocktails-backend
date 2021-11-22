@@ -5,6 +5,8 @@ import de.slevermann.cocktails.api.model.CocktailListEntry;
 import de.slevermann.cocktails.api.model.CreateIngredient;
 import de.slevermann.cocktails.api.model.Ingredient;
 import de.slevermann.cocktails.api.model.IngredientType;
+import de.slevermann.cocktails.api.model.PagedCocktails;
+import de.slevermann.cocktails.api.model.PagedIngredients;
 import de.slevermann.cocktails.backend.service.CocktailService;
 import de.slevermann.cocktails.backend.service.IngredientService;
 import de.slevermann.cocktails.backend.service.problem.MissingReferenceProblem;
@@ -72,22 +74,26 @@ public class IngredientControllerTest {
                 .id(UUID.randomUUID()).type(type);
         final var second = new Ingredient().description("descTwo").name("nameTwo")
                 .id(UUID.randomUUID()).type(type);
-        when(ingredientService.ingredients(anyInt(), anyInt())).thenReturn(
-                List.of(first, second)
-        );
+        final var ingredients = new PagedIngredients()
+                .ingredients(List.of(first, second))
+                .lastPage(2L)
+                .total(3L);
+        when(ingredientService.ingredients(anyInt(), anyInt())).thenReturn(ingredients);
 
         mockMvc.perform(get("/ingredients").param("page", "1")
                         .param("pageSize", "2"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(APPLICATION_JSON))
-                .andExpect(jsonPath("$[0].id").value(first.getId().toString()))
-                .andExpect(jsonPath("$[0].name").value(first.getName()))
-                .andExpect(jsonPath("$[0].description").value(first.getDescription()))
-                .andExpect(jsonPath("$[0].type.id").value(type.getId().toString()))
-                .andExpect(jsonPath("$[1].id").value(second.getId().toString()))
-                .andExpect(jsonPath("$[1].name").value(second.getName()))
-                .andExpect(jsonPath("$[1].description").value(second.getDescription()))
-                .andExpect(jsonPath("$[1].type.id").value(type.getId().toString()));
+                .andExpect(jsonPath("$.ingredients[0].id").value(first.getId().toString()))
+                .andExpect(jsonPath("$.ingredients[0].name").value(first.getName()))
+                .andExpect(jsonPath("$.ingredients[0].description").value(first.getDescription()))
+                .andExpect(jsonPath("$.ingredients[0].type.id").value(type.getId().toString()))
+                .andExpect(jsonPath("$.ingredients[1].id").value(second.getId().toString()))
+                .andExpect(jsonPath("$.ingredients[1].name").value(second.getName()))
+                .andExpect(jsonPath("$.ingredients[1].description").value(second.getDescription()))
+                .andExpect(jsonPath("$.ingredients[1].type.id").value(type.getId().toString()))
+                .andExpect(jsonPath("$.lastPage").value(2L))
+                .andExpect(jsonPath("$.total").value(3L));
     }
 
     @Test
@@ -255,21 +261,25 @@ public class IngredientControllerTest {
                 .name("Old Fashioned")
                 .description("The classic")
                 .id(UUID.randomUUID());
-        when(cocktailService.findByIngredient(anyInt(), anyInt(), any())).thenReturn(
-                List.of(first, second)
-        );
+        final var pagedCocktails = new PagedCocktails()
+                .cocktails(List.of(first, second))
+                .lastPage(2L)
+                .total(3L);
+        when(cocktailService.findByIngredient(anyInt(), anyInt(), any())).thenReturn(pagedCocktails);
 
         mockMvc.perform(get("/ingredients/{uuid}/cocktails", UUID.randomUUID())
                         .param("page", "1")
                         .param("pageSize", "2"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(APPLICATION_JSON))
-                .andExpect(jsonPath("$[0].name").value(first.getName()))
-                .andExpect(jsonPath("$[0].description").value(first.getDescription()))
-                .andExpect(jsonPath("$[0].id").value(first.getId().toString()))
-                .andExpect(jsonPath("$[1].name").value(second.getName()))
-                .andExpect(jsonPath("$[1].description").value(second.getDescription()))
-                .andExpect(jsonPath("$[1].id").value(second.getId().toString()));
+                .andExpect(jsonPath("$.cocktails[0].name").value(first.getName()))
+                .andExpect(jsonPath("$.cocktails[0].description").value(first.getDescription()))
+                .andExpect(jsonPath("$.cocktails[0].id").value(first.getId().toString()))
+                .andExpect(jsonPath("$.cocktails[1].name").value(second.getName()))
+                .andExpect(jsonPath("$.cocktails[1].description").value(second.getDescription()))
+                .andExpect(jsonPath("$.cocktails[1].id").value(second.getId().toString()))
+                .andExpect(jsonPath("$.lastPage").value(2L))
+                .andExpect(jsonPath("$.total").value(3L));
     }
 
     @Test

@@ -2,6 +2,7 @@ package de.slevermann.cocktails.backend.service;
 
 import de.slevermann.cocktails.api.model.CreateIngredient;
 import de.slevermann.cocktails.api.model.Ingredient;
+import de.slevermann.cocktails.api.model.PagedIngredients;
 import de.slevermann.cocktails.backend.dao.IngredientDao;
 import de.slevermann.cocktails.backend.dao.IngredientTypeDao;
 import de.slevermann.cocktails.backend.model.mapper.IngredientMapper;
@@ -13,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.UUID;
 
 
@@ -28,9 +28,18 @@ public class IngredientService {
 
     private final IngredientMapper ingredientMapper;
 
-    public List<Ingredient> ingredients(final int page, final int pageSize) {
-        return ingredientDao.getAll((page - 1) * pageSize, pageSize)
+    public PagedIngredients ingredients(final int page, final int pageSize) {
+        final var ingredients = ingredientDao.getAll((page - 1) * pageSize, pageSize)
                 .stream().map(ingredientMapper::fromDb).toList();
+        final var count = count();
+        var totalPages = count / pageSize;
+        if (count % pageSize != 0) {
+            totalPages++;
+        }
+        return new PagedIngredients()
+                .ingredients(ingredients)
+                .total(count)
+                .lastPage(totalPages);
     }
 
     public long count() {
@@ -83,13 +92,23 @@ public class IngredientService {
         return ingredientMapper.fromDb(updated);
     }
 
-    public List<Ingredient> findByType(final UUID type,
+    public PagedIngredients findByType(final UUID type,
                                        final int page,
                                        final int pageSize) {
         if (ingredientTypeDao.getById(type) == null) {
             throw new NoSuchResourceProblem(ResourceType.INGREDIENT_TYPE, type.toString());
         }
-        return ingredientDao.findByType(type, (page - 1) * pageSize, pageSize)
+
+        final var ingredients = ingredientDao.findByType(type, (page - 1) * pageSize, pageSize)
                 .stream().map(ingredientMapper::fromDb).toList();
+        final var count = ingredientDao.countByType(type);
+        var totalPages = count / pageSize;
+        if (count % pageSize != 0) {
+            totalPages++;
+        }
+        return new PagedIngredients()
+                .ingredients(ingredients)
+                .total(count)
+                .lastPage(totalPages);
     }
 }

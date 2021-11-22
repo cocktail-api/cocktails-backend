@@ -1,8 +1,8 @@
 package de.slevermann.cocktails.backend.controller;
 
 import de.slevermann.cocktails.api.model.Cocktail;
-import de.slevermann.cocktails.api.model.CocktailListEntry;
 import de.slevermann.cocktails.api.model.CreateCocktail;
+import de.slevermann.cocktails.api.model.PagedCocktails;
 import de.slevermann.cocktails.backend.service.CocktailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
-import java.util.List;
 import java.util.UUID;
 
 import static org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder.fromMethodCall;
@@ -33,8 +32,8 @@ public class CocktailController {
     private final CocktailService cocktailService;
 
     @GetMapping
-    public List<CocktailListEntry> getAll(@RequestParam(name = "page", defaultValue = "1") @Min(1) final int page,
-                                          @RequestParam(name = "pageSize", defaultValue = "10") @Min(1) @Max(50) final int pageSize) {
+    public PagedCocktails getAll(@RequestParam(name = "page", defaultValue = "1") @Min(1) final int page,
+                                 @RequestParam(name = "pageSize", defaultValue = "20") @Min(1) @Max(50) final int pageSize) {
         return cocktailService.cocktails(page, pageSize);
     }
 

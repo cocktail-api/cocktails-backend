@@ -80,4 +80,10 @@ public interface IngredientDao {
             description = "Performance of fetching ingredients by UUID",
             percentiles = {0.99, 0.95, 0.9, 0.5})
     Set<UUID> findIngredients(@BindList("ingredients") final Set<UUID> ingredients);
+
+    @SqlQuery
+    @Timed(value = "ingredients.countByType",
+            description = "Performance of ingredient counting by type",
+            percentiles = {0.99, 0.95, 0.9, 0.5})
+    long countByType(@Bind("type") final UUID uuid);
 }

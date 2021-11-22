@@ -61,8 +61,26 @@ public class CocktailServiceTest {
         ));
         when(cocktailMapper.fromDb((DbCocktail) any())).thenReturn(new CocktailListEntry()
                 .id(randomUUID()));
+        when(cocktailDao.count()).thenReturn(3L);
+        final var cocktails = cocktailService.cocktails(1, 2);
+        assertEquals(2, cocktails.getCocktails().size());
+        assertEquals(3, cocktails.getTotal());
+        assertEquals(2, cocktails.getLastPage());
+    }
 
-        assertEquals(2, cocktailService.cocktails(1, 2).size());
+    @Test
+    void testListEven() {
+        when(cocktailDao.getAll(0, 2)).thenReturn(List.of(
+                new DbCocktail(randomUUID(), "name", "description"),
+                new DbCocktail(randomUUID(), "name", "description")
+        ));
+        when(cocktailMapper.fromDb((DbCocktail) any())).thenReturn(new CocktailListEntry()
+                .id(randomUUID()));
+        when(cocktailDao.count()).thenReturn(4L);
+        final var cocktails = cocktailService.cocktails(1, 2);
+        assertEquals(2, cocktails.getCocktails().size());
+        assertEquals(4, cocktails.getTotal());
+        assertEquals(2, cocktails.getLastPage());
     }
 
     @Test
@@ -108,8 +126,32 @@ public class CocktailServiceTest {
         when(cocktailDao.findByIngredient(anyInt(), anyInt(), any())).thenReturn(List.of(
                 first, second
         ));
+        when(cocktailDao.countByIngredient(any())).thenReturn(3L);
 
-        assertEquals(2, cocktailService.findByIngredient(1, 2, randomUUID()).size());
+        final var cocktails = cocktailService.findByIngredient(1, 2, randomUUID());
+        assertEquals(2, cocktails.getCocktails().size());
+        assertEquals(3, cocktails.getTotal());
+        assertEquals(2, cocktails.getLastPage());
+    }
+
+    @Test
+    void testFindByIngredientEven() {
+        final var type = new DbIngredientType(randomUUID(), "type");
+        final var dbIngredient = new DbIngredient(randomUUID(), type, "ingredientName", "ingredientDescription");
+
+        when(ingredientDao.getById(any())).thenReturn(dbIngredient);
+
+        final var first = new DbCocktail(randomUUID(), "nameOne", "descriptionOne");
+        final var second = new DbCocktail(randomUUID(), "nameTwo", "descriptionTwo");
+        when(cocktailDao.findByIngredient(anyInt(), anyInt(), any())).thenReturn(List.of(
+                first, second
+        ));
+        when(cocktailDao.countByIngredient(any())).thenReturn(4L);
+
+        final var cocktails = cocktailService.findByIngredient(1, 2, randomUUID());
+        assertEquals(2, cocktails.getCocktails().size());
+        assertEquals(4, cocktails.getTotal());
+        assertEquals(2, cocktails.getLastPage());
     }
 
     @Test

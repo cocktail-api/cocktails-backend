@@ -117,4 +117,10 @@ public interface CocktailDao {
     List<DbCocktail> findByIngredient(@Bind("offset") final int offset,
                                       @Bind("pageSize") final int pageSize,
                                       @Bind("uuid") final UUID uuid);
+    @SqlQuery
+    @Timed(value = "cocktails.countByIngredient",
+            description = "Performance of cocktail counting by ingredient",
+            percentiles = {0.99, 0.95, 0.9, 0.5})
+    long countByIngredient(@Bind("uuid") final UUID uuid);
+
 }
