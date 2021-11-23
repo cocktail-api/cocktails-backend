@@ -237,4 +237,17 @@ public class IngredientDaoTest extends DaoTestBase {
                 randomUUID(), randomUUID()
         )).size());
     }
+
+    @Order(80)
+    @Test
+    void testCountByType() {
+        final var type = ingredientTypeDao.create("someNewAmazingType");
+        assertEquals(0, ingredientDao.countByType(type.id()));
+
+        ingredientDao.create(new DbCreateIngredient(type.id(), "someGreatName", "description"));
+        assertEquals(1, ingredientDao.countByType(type.id()));
+
+        ingredientDao.create(new DbCreateIngredient(type.id(), "another", "foo"));
+        assertEquals(2, ingredientDao.countByType(type.id()));
+    }
 }
