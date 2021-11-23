@@ -194,7 +194,7 @@ public class IngredientControllerTest {
                 .andExpect(status().isUnprocessableEntity())
                 .andExpect(jsonPath("$.referencedResourceType")
                         .value(problem.getReferencedResourceType().getType()))
-                .andExpect(jsonPath("$.resourceId").value(problem.getResourceId()));
+                .andExpect(jsonPath("$.resourceIds[0]").value(typeId.toString()));
     }
 
     @Test
@@ -230,7 +230,7 @@ public class IngredientControllerTest {
                 .andExpect(status().isUnprocessableEntity())
                 .andExpect(jsonPath("$.referencedResourceType")
                         .value(problem.getReferencedResourceType().getType()))
-                .andExpect(jsonPath("$.resourceId").value(problem.getResourceId()));
+                .andExpect(jsonPath("$.resourceIds[0]").value(typeId.toString()));
     }
 
     @Test

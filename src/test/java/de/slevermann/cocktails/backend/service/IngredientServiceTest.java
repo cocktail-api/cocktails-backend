@@ -19,6 +19,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoSettings;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import static de.slevermann.cocktails.backend.service.problem.ResourceType.INGREDIENT;
@@ -178,7 +179,7 @@ public class IngredientServiceTest {
         final var ex = assertThrows(MissingReferenceProblem.class,
                 () -> ingredientService.create(new CreateIngredient().type(id).name("beer").description("tasty")));
 
-        assertEquals(ex.getResourceId(), id.toString());
+        assertEquals(ex.getResourceIds(), Set.of(id.toString()));
         assertEquals(ex.getReferencedResourceType(), INGREDIENT_TYPE);
     }
 
@@ -206,7 +207,7 @@ public class IngredientServiceTest {
         final var ex = assertThrows(MissingReferenceProblem.class,
                 () -> ingredientService.update(new CreateIngredient().type(id).name("beer").description("tasty"), id));
 
-        assertEquals(ex.getResourceId(), id.toString());
+        assertEquals(ex.getResourceIds(), Set.of(id.toString()));
         assertEquals(ex.getReferencedResourceType(), INGREDIENT_TYPE);
     }
 

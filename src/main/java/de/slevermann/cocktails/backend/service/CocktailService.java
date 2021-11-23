@@ -84,20 +84,20 @@ public class CocktailService {
     }
 
     public Cocktail create(final CreateCocktail cocktail) {
-        final var cocktailIds = cocktail.getIngredients().stream().map(CreateCocktailIngredient::getId)
+        final var ingredientIds = cocktail.getIngredients().stream().map(CreateCocktailIngredient::getId)
                 .collect(Collectors.toSet());
-        final var dbIds = ingredientDao.findIngredients(cocktailIds);
+        final var dbIds = ingredientDao.findIngredients(ingredientIds);
 
         /*
          * Relative complement of the two sets.
          *
-         * cocktailIds now contains all the IDs that were in the request but are not in the database
+         * ingredientIds now contains all the IDs that were in the request but are not in the database
          */
-        cocktailIds.removeAll(dbIds);
-        cocktailIds.stream().findAny().ifPresent(id ->
-        {
-            throw new MissingReferenceProblem(ResourceType.INGREDIENT, id.toString());
-        });
+        ingredientIds.removeAll(dbIds);
+        if (!ingredientIds.isEmpty()) {
+            throw new MissingReferenceProblem(ResourceType.INGREDIENT,
+                    ingredientIds.stream().map(UUID::toString).collect(Collectors.toSet()));
+        }
 
         final var dbCreateCocktail = cocktailMapper.fromApi(cocktail);
         final var dbCocktail = cocktailDao.create(dbCreateCocktail);
