@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -112,7 +113,8 @@ public class CocktailService {
             createInstructions.add(cocktailMapper.fromApi(apiInstructions.get(i), i));
         }
         // Due to the batching, we are not guaranteed the correct ordering on insert, only on updates. Sort manually
-        final List<DbInstruction> instructions = cocktailDao.addInstructions(dbCocktail.id(), createInstructions);
+        List<DbInstruction> instructions = new ArrayList<>(cocktailDao.addInstructions(dbCocktail.id(), createInstructions));
+
         instructions.sort(Comparator.comparing(DbInstruction::number));
 
         return cocktailMapper.fromDb(dbCocktail, dbIngredients, instructions);
