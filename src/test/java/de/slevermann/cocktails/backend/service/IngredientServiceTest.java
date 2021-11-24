@@ -2,20 +2,22 @@ package de.slevermann.cocktails.backend.service;
 
 import de.slevermann.cocktails.api.model.CreateIngredient;
 import de.slevermann.cocktails.api.model.Ingredient;
+import de.slevermann.cocktails.api.model.IngredientType;
 import de.slevermann.cocktails.backend.dao.IngredientDao;
 import de.slevermann.cocktails.backend.dao.IngredientTypeDao;
 import de.slevermann.cocktails.backend.model.db.DbIngredient;
 import de.slevermann.cocktails.backend.model.db.DbIngredientType;
-import de.slevermann.cocktails.backend.model.db.create.DbCreateIngredient;
 import de.slevermann.cocktails.backend.model.mapper.IngredientMapper;
+import de.slevermann.cocktails.backend.model.mapper.IngredientMapperImpl;
+import de.slevermann.cocktails.backend.model.mapper.IngredientTypeMapper;
+import de.slevermann.cocktails.backend.model.mapper.IngredientTypeMapperImpl;
 import de.slevermann.cocktails.backend.service.problem.MissingReferenceProblem;
 import de.slevermann.cocktails.backend.service.problem.NoSuchResourceProblem;
 import de.slevermann.cocktails.backend.service.problem.ReferencedEntityProblem;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoSettings;
 
 import java.util.List;
@@ -35,17 +37,17 @@ import static org.mockito.Mockito.when;
 @MockitoSettings
 public class IngredientServiceTest {
 
-    @Mock
-    private IngredientTypeDao ingredientTypeDao;
+    private final IngredientTypeDao ingredientTypeDao = Mockito.mock(IngredientTypeDao.class);
 
-    @Mock
-    private IngredientDao ingredientDao;
+    private final IngredientDao ingredientDao = Mockito.mock(IngredientDao.class);
 
-    @Mock
-    private IngredientMapper ingredientMapper;
+    private final IngredientTypeMapper ingredientTypeMapper = new IngredientTypeMapperImpl();
 
-    @InjectMocks
-    private IngredientService ingredientService;
+    private final IngredientMapper ingredientMapper = new IngredientMapperImpl(ingredientTypeMapper);
+
+    private final IngredientService ingredientService = new IngredientService(
+            ingredientDao, ingredientTypeDao, ingredientMapper
+    );
 
 
     @ParameterizedTest
@@ -63,7 +65,6 @@ public class IngredientServiceTest {
                 new DbIngredient(randomUUID(), type, "name", "description"),
                 new DbIngredient(randomUUID(), type, "name", "description")
         ));
-        when(ingredientMapper.fromDb(any())).thenReturn(new Ingredient());
         when(ingredientDao.count()).thenReturn(3L);
         final var pagedIngredients = ingredientService.ingredients(1, 2);
         assertEquals(2, pagedIngredients.getIngredients().size());
@@ -78,7 +79,6 @@ public class IngredientServiceTest {
                 new DbIngredient(randomUUID(), type, "name", "description"),
                 new DbIngredient(randomUUID(), type, "name", "description")
         ));
-        when(ingredientMapper.fromDb(any())).thenReturn(new Ingredient());
         when(ingredientDao.count()).thenReturn(4L);
         final var pagedIngredients = ingredientService.ingredients(1, 2);
         assertEquals(2, pagedIngredients.getIngredients().size());
@@ -88,11 +88,14 @@ public class IngredientServiceTest {
 
     @Test
     void testGetById() {
-        final var type = new DbIngredientType(randomUUID(), "name");
-        final var ingredient = new Ingredient().name("beer");
+        final var typeId = randomUUID();
+        final var type = new DbIngredientType(typeId, "name");
+        final var ingredientId = randomUUID();
+        final var ingredient = new Ingredient().name("beer").description("description").type(
+                new IngredientType().name("name").id(typeId)
+        ).id(ingredientId);
         when(ingredientDao.getById(any()))
-                .thenReturn(new DbIngredient(randomUUID(), type, "name", "description"));
-        when(ingredientMapper.fromDb(any())).thenReturn(ingredient);
+                .thenReturn(new DbIngredient(ingredientId, type, "beer", "description"));
         assertEquals(ingredient, ingredientService.get(randomUUID()));
     }
 
@@ -157,16 +160,15 @@ public class IngredientServiceTest {
 
     @Test
     void testCreate() {
-        final var id = randomUUID();
-        final var type = new DbIngredientType(id, "tasty things");
-        when(ingredientTypeDao.getById(id)).thenReturn(type);
-        final var ingredient = new CreateIngredient().type(id).name("beer").description("tasty");
-        final var dbCreateIngredient = new DbCreateIngredient(id, "beer", "tasty");
-        when(ingredientMapper.fromApi(ingredient)).thenReturn(dbCreateIngredient);
-        final var dbIngredient = new DbIngredient(randomUUID(), type, "beer", "tasty");
-        when(ingredientDao.create(dbCreateIngredient)).thenReturn(dbIngredient);
-        final var finishedIngredient = new Ingredient().name("beer").description("tasty");
-        when(ingredientMapper.fromDb(dbIngredient)).thenReturn(finishedIngredient);
+        final var ingredientId = randomUUID();
+        final var typeId = randomUUID();
+        final var type = new DbIngredientType(typeId, "tasty things");
+        when(ingredientTypeDao.getById(any())).thenReturn(type);
+        final var ingredient = new CreateIngredient().type(typeId).name("beer").description("tasty");
+        final var dbIngredient = new DbIngredient(ingredientId, type, "beer", "tasty");
+        when(ingredientDao.create(any())).thenReturn(dbIngredient);
+        final var finishedIngredient = new Ingredient().name("beer").description("tasty")
+                .id(ingredientId).type(new IngredientType().id(typeId).name("tasty things"));
 
         assertEquals(finishedIngredient, ingredientService.create(ingredient));
     }
@@ -185,18 +187,17 @@ public class IngredientServiceTest {
 
     @Test
     void testUpdate() {
-        final var id = randomUUID();
-        final var type = new DbIngredientType(id, "tasty things");
+        final var typeId = randomUUID();
+        final var ingredientId = randomUUID();
+        final var type = new DbIngredientType(typeId, "tasty things");
         when(ingredientTypeDao.getById(any())).thenReturn(type);
-        final var ingredient = new CreateIngredient().type(id).name("beer").description("tasty");
-        final var dbCreateIngredient = new DbCreateIngredient(id, "beer", "tasty");
-        when(ingredientMapper.fromApi(any())).thenReturn(dbCreateIngredient);
-        final var dbIngredient = new DbIngredient(randomUUID(), type, "beer", "tasty");
+        final var ingredient = new CreateIngredient().type(typeId).name("beer").description("tasty");
+        final var dbIngredient = new DbIngredient(ingredientId, type, "beer", "tasty");
         when(ingredientDao.update(any(), any())).thenReturn(dbIngredient);
-        final var finishedIngredient = new Ingredient().name("beer").description("tasty");
-        when(ingredientMapper.fromDb(any())).thenReturn(finishedIngredient);
+        final var finishedIngredient = new Ingredient().name("beer").description("tasty")
+                .id(ingredientId).type(new IngredientType().name("tasty things").id(typeId));
 
-        assertEquals(finishedIngredient, ingredientService.update(ingredient, id));
+        assertEquals(finishedIngredient, ingredientService.update(ingredient, ingredientId));
     }
 
     @Test
@@ -216,8 +217,6 @@ public class IngredientServiceTest {
         final var id = randomUUID();
         final var type = new DbIngredientType(id, "tasty things");
         when(ingredientTypeDao.getById(any())).thenReturn(type);
-        final var dbCreateIngredient = new DbCreateIngredient(id, "beer", "tasty");
-        when(ingredientMapper.fromApi(any())).thenReturn(dbCreateIngredient);
         when(ingredientDao.update(any(), any())).thenReturn(null);
 
         final var ex = assertThrows(NoSuchResourceProblem.class,
@@ -234,7 +233,6 @@ public class IngredientServiceTest {
                 new DbIngredient(randomUUID(), type, "name", "description"),
                 new DbIngredient(randomUUID(), type, "name", "description")
         ));
-        when(ingredientMapper.fromDb(any())).thenReturn(new Ingredient());
         when(ingredientDao.countByType(any())).thenReturn(3L);
         final var pagedIngredients = ingredientService.findByType(UUID.randomUUID(), 1, 2);
         assertEquals(2, pagedIngredients.getIngredients().size());
@@ -250,7 +248,6 @@ public class IngredientServiceTest {
                 new DbIngredient(randomUUID(), type, "name", "description"),
                 new DbIngredient(randomUUID(), type, "name", "description")
         ));
-        when(ingredientMapper.fromDb(any())).thenReturn(new Ingredient());
         when(ingredientDao.countByType(any())).thenReturn(4L);
         final var pagedIngredients = ingredientService.findByType(UUID.randomUUID(), 1, 2);
         assertEquals(2, pagedIngredients.getIngredients().size());
