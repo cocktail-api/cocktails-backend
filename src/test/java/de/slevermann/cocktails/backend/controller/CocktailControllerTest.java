@@ -38,6 +38,7 @@ import static org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -238,5 +239,110 @@ class CocktailControllerTest {
                 .andExpect(content().contentType(APPLICATION_PROBLEM_JSON))
                 .andExpect(jsonPath("$.resourceType").value(problem.getResourceType().getType()))
                 .andExpect(jsonPath("$.resourceId").value(problem.getResourceId()));
+    }
+
+    @Test
+    void testUpdate() throws Exception {
+        final var id = randomUUID();
+        final var cocktail = new CreateCocktail()
+                .name("Daiquiri")
+                .description("Sour rum cocktail")
+                .instructions(List.of(new CocktailInstruction().text("hello")))
+                .ingredients(List.of(new CreateCocktailIngredient()
+                        .id(randomUUID())
+                        .amount(20d)
+                        .garnish(false)
+                        .optional(false)));
+        final var typeId = randomUUID();
+        final var ingredientId = randomUUID();
+        final var updated = new Cocktail()
+                .id(id)
+                .name("Daiquiri")
+                .description("Sour rum cocktail")
+                .instructions(List.of(new CocktailInstruction().text("hello")))
+                .ingredients(List.of(new CocktailIngredient()
+                        .type(new IngredientType().id(typeId).name("type"))
+                        .id(ingredientId)
+                        .name("ingredient")
+                        .description("ingredientDescription")
+                        .garnish(false)
+                        .optional(false)
+                        .unit(Unit.MILLILITERS)
+                        .amount(20d)));
+
+        when(cocktailService.update(any(), any())).thenReturn(updated);
+
+        mockMvc.perform(put("/cocktails/{uuid}", id)
+                        .contentType(APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsBytes(cocktail)))
+                .andExpect(content().contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(updated.getId().toString()))
+                .andExpect(jsonPath("$.name").value(updated.getName()))
+                .andExpect(jsonPath("$.description").value(updated.getDescription()))
+                .andExpect(jsonPath("$.instructions.length()").value(updated.getInstructions().size()))
+                .andExpect(jsonPath("$.instructions[0].text").value(updated.getInstructions().get(0).getText()))
+                .andExpect(jsonPath("$.ingredients.length()").value(updated.getIngredients().size()))
+                .andExpect(jsonPath("$.ingredients[0].type.id").value(typeId.toString()))
+                .andExpect(jsonPath("$.ingredients[0].type.name").value(updated.getIngredients().get(0).getType().getName()))
+                .andExpect(jsonPath("$.ingredients[0].id").value(updated.getIngredients().get(0).getId().toString()))
+                .andExpect(jsonPath("$.ingredients[0].name").value(updated.getIngredients().get(0).getName()))
+                .andExpect(jsonPath("$.ingredients[0].description").value(updated.getIngredients().get(0).getDescription()))
+                .andExpect(jsonPath("$.ingredients[0].garnish").value(updated.getIngredients().get(0).getGarnish()))
+                .andExpect(jsonPath("$.ingredients[0].optional").value(updated.getIngredients().get(0).getOptional()))
+                .andExpect(jsonPath("$.ingredients[0].unit").value(updated.getIngredients().get(0).getUnit().getValue()))
+                .andExpect(jsonPath("$.ingredients[0].amount").value(updated.getIngredients().get(0).getAmount()));
+    }
+
+    @Test
+    void testUpdateMissing() throws Exception {
+        final var id = randomUUID();
+        final var cocktail = new CreateCocktail()
+                .name("Daiquiri")
+                .description("Sour rum cocktail")
+                .instructions(List.of(new CocktailInstruction().text("hello")))
+                .ingredients(List.of(new CreateCocktailIngredient()
+                        .id(randomUUID())
+                        .amount(20d)
+                        .garnish(false)
+                        .optional(false)));
+        final var problem = new NoSuchResourceProblem(COCKTAIL, id);
+        when(cocktailService.update(any(), any())).thenThrow(problem);
+
+        mockMvc.perform(put("/cocktails/{uuid}", id)
+                        .contentType(APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsBytes(cocktail)))
+                .andExpect(status().isNotFound())
+                .andExpect(content().contentType(APPLICATION_PROBLEM_JSON))
+                .andExpect(jsonPath("$.resourceType").value(problem.getResourceType().getType()))
+                .andExpect(jsonPath("$.resourceId").value(problem.getResourceId()));
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {1, 2, 5, 10, 20})
+    void testUpdateMissingReference(final int count) throws Exception {
+        final var ids = new HashSet<String>();
+        for (int i = 0; i < count; i++) {
+            ids.add(randomUUID().toString());
+        }
+        final var problem = new MissingReferenceProblem(INGREDIENT, ids);
+        final var id = randomUUID();
+        final var cocktail = new CreateCocktail()
+                .name("Daiquiri")
+                .description("Sour rum cocktail")
+                .instructions(List.of(new CocktailInstruction().text("hello")))
+                .ingredients(List.of(new CreateCocktailIngredient()
+                        .id(randomUUID())
+                        .amount(20d)
+                        .garnish(false)
+                        .optional(false)));
+        when(cocktailService.update(any(), any())).thenThrow(problem);
+        mockMvc.perform(put("/cocktails/{uuid}", id)
+                        .contentType(APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsBytes(cocktail)))
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(content().contentType(APPLICATION_PROBLEM_JSON))
+                .andExpect(jsonPath("$.referencedResourceType").value(problem.getReferencedResourceType().getType()))
+                .andExpect(jsonPath("$.resourceIds.length()").value(count));
     }
 }

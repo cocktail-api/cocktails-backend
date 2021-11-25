@@ -6,6 +6,7 @@ import de.slevermann.cocktails.api.model.CreateCocktailIngredient;
 import de.slevermann.cocktails.api.model.PagedCocktails;
 import de.slevermann.cocktails.backend.dao.CocktailDao;
 import de.slevermann.cocktails.backend.dao.IngredientDao;
+import de.slevermann.cocktails.backend.model.db.DbCocktail;
 import de.slevermann.cocktails.backend.model.db.DbCocktailIngredient;
 import de.slevermann.cocktails.backend.model.db.DbInstruction;
 import de.slevermann.cocktails.backend.model.db.create.DbCreateInstruction;
@@ -26,6 +27,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static de.slevermann.cocktails.backend.service.problem.ResourceType.COCKTAIL;
+import static java.util.function.Predicate.not;
 
 @RequiredArgsConstructor
 @Service
@@ -87,6 +89,61 @@ public class CocktailService {
     }
 
     public Cocktail create(final CreateCocktail cocktail) {
+        checkIngredients(cocktail);
+
+        final var dbCreateCocktail = cocktailMapper.fromApi(cocktail);
+        final var dbCocktail = cocktailDao.create(dbCreateCocktail);
+        return saveCocktail(cocktail, dbCocktail);
+    }
+
+    private Cocktail saveCocktail(CreateCocktail cocktail, DbCocktail dbCocktail) {
+        final var ingredients = cocktail.getIngredients().stream()
+                .map(cocktailMapper::fromApi).collect(Collectors.toList());
+        cocktailDao.addIngredients(dbCocktail.id(), ingredients);
+        final List<DbCocktailIngredient> dbIngredients = cocktailDao.getIngredients(dbCocktail.id());
+
+        final Set<DbCreateInstruction> createInstructions = new HashSet<>();
+        final var apiInstructions = cocktail.getInstructions();
+        for (int i = 0; i < apiInstructions.size(); i++) {
+            createInstructions.add(cocktailMapper.fromApi(apiInstructions.get(i), i));
+        }
+        // Due to the batching, we are not guaranteed the correct ordering on modify, only on reads. Sort manually
+        List<DbInstruction> instructions = new ArrayList<>(cocktailDao.addInstructions(dbCocktail.id(), createInstructions));
+
+        instructions.sort(Comparator.comparing(DbInstruction::number));
+
+        return cocktailMapper.fromDb(dbCocktail, dbIngredients, instructions);
+    }
+
+    public void delete(final UUID uuid) {
+        final var rowsAffected = cocktailDao.delete(uuid);
+
+        if (rowsAffected == 0) {
+            throw new NoSuchResourceProblem(COCKTAIL, uuid.toString());
+        }
+    }
+
+    public Cocktail update(final CreateCocktail cocktail, final UUID uuid) {
+        if (!cocktailDao.exists(uuid)) {
+            throw new NoSuchResourceProblem(COCKTAIL, uuid);
+        }
+
+        checkIngredients(cocktail);
+
+        final var newIds = cocktail.getIngredients()
+                .stream().map(CreateCocktailIngredient::getId).collect(Collectors.toSet());
+        final var toRemove = cocktailDao.getIngredients(uuid).stream()
+                .map(DbCocktailIngredient::id).filter(not(newIds::contains)).collect(Collectors.toSet());
+        cocktailDao.removeIngredients(uuid, toRemove);
+
+        final var dbCreateCocktail = cocktailMapper.fromApi(cocktail);
+        final var dbCocktail = cocktailDao.update(uuid, dbCreateCocktail);
+
+        cocktailDao.clearInstructions(uuid);
+        return saveCocktail(cocktail, dbCocktail);
+    }
+
+    private void checkIngredients(CreateCocktail cocktail) {
         final var ingredientIds = cocktail.getIngredients().stream().map(CreateCocktailIngredient::getId)
                 .collect(Collectors.toSet());
         final var dbIds = ingredientDao.findIngredients(ingredientIds);
@@ -100,33 +157,6 @@ public class CocktailService {
         if (!ingredientIds.isEmpty()) {
             throw new MissingReferenceProblem(ResourceType.INGREDIENT,
                     ingredientIds.stream().map(UUID::toString).collect(Collectors.toSet()));
-        }
-
-        final var dbCreateCocktail = cocktailMapper.fromApi(cocktail);
-        final var dbCocktail = cocktailDao.create(dbCreateCocktail);
-        final var ingredients = cocktail.getIngredients().stream()
-                .map(cocktailMapper::fromApi).collect(Collectors.toList());
-        cocktailDao.addIngredients(dbCocktail.id(), ingredients);
-        final List<DbCocktailIngredient> dbIngredients = cocktailDao.getIngredients(dbCocktail.id());
-
-        final Set<DbCreateInstruction> createInstructions = new HashSet<>();
-        final var apiInstructions = cocktail.getInstructions();
-        for (int i = 0; i < apiInstructions.size(); i++) {
-            createInstructions.add(cocktailMapper.fromApi(apiInstructions.get(i), i));
-        }
-        // Due to the batching, we are not guaranteed the correct ordering on insert, only on updates. Sort manually
-        List<DbInstruction> instructions = new ArrayList<>(cocktailDao.addInstructions(dbCocktail.id(), createInstructions));
-
-        instructions.sort(Comparator.comparing(DbInstruction::number));
-
-        return cocktailMapper.fromDb(dbCocktail, dbIngredients, instructions);
-    }
-
-    public void delete(final UUID uuid) {
-        final var rowsAffected = cocktailDao.delete(uuid);
-
-        if (rowsAffected == 0) {
-            throw new NoSuchResourceProblem(COCKTAIL, uuid.toString());
         }
     }
 }

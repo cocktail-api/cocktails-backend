@@ -333,4 +333,11 @@ public class CocktailDaoTest extends DaoTestBase {
         ));
         assertEquals(2, cocktailDao.countByIngredient(ingredient.id()));
     }
+
+    @Order(105)
+    @Test
+    void testExists() {
+        assertFalse(cocktailDao.exists(UUID.randomUUID()));
+        assertTrue(cocktailDao.exists(secondCocktail.id()));
+    }
 }

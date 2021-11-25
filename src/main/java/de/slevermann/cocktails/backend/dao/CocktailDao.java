@@ -123,4 +123,9 @@ public interface CocktailDao {
             percentiles = {0.99, 0.95, 0.9, 0.5})
     long countByIngredient(@Bind("uuid") final UUID uuid);
 
+    @SqlQuery
+    @Timed(value = "cocktails.exists",
+            description = "Performance of cocktail existence",
+            percentiles = {0.99, 0.95, 0.9, 0.5})
+    boolean exists(@Bind("uuid") final UUID uuid);
 }
