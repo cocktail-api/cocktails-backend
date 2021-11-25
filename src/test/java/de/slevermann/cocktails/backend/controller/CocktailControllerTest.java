@@ -30,9 +30,12 @@ import static de.slevermann.cocktails.backend.service.problem.ResourceType.INGRE
 import static java.util.UUID.randomUUID;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -214,5 +217,26 @@ class CocktailControllerTest {
                 .andExpect(jsonPath("$.referencedResourceType")
                         .value(problem.getReferencedResourceType().getType()))
                 .andExpect(jsonPath("$.resourceIds.length()").value(count));
+    }
+
+    @Test
+    void testDelete() throws Exception {
+        doNothing().when(cocktailService).delete(any());
+
+        mockMvc.perform(delete("/cocktails/{uuid}", randomUUID()))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void testDeleteMissing() throws Exception {
+        final var id = randomUUID();
+        final var problem = new NoSuchResourceProblem(COCKTAIL, id.toString());
+        doThrow(problem).when(cocktailService).delete(any());
+
+        mockMvc.perform(delete("/cocktails/{uuid}", randomUUID()))
+                .andExpect(status().isNotFound())
+                .andExpect(content().contentType(APPLICATION_PROBLEM_JSON))
+                .andExpect(jsonPath("$.resourceType").value(problem.getResourceType().getType()))
+                .andExpect(jsonPath("$.resourceId").value(problem.getResourceId()));
     }
 }

@@ -25,6 +25,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static de.slevermann.cocktails.backend.service.problem.ResourceType.COCKTAIL;
+
 @RequiredArgsConstructor
 @Service
 @Transactional
@@ -54,7 +56,7 @@ public class CocktailService {
         final var fromDb = cocktailDao.getById(uuid);
 
         if (fromDb == null) {
-            throw new NoSuchResourceProblem(ResourceType.COCKTAIL, uuid.toString());
+            throw new NoSuchResourceProblem(COCKTAIL, uuid.toString());
         }
 
         final var ingredients = cocktailDao.getIngredients(fromDb.id());
@@ -118,5 +120,13 @@ public class CocktailService {
         instructions.sort(Comparator.comparing(DbInstruction::number));
 
         return cocktailMapper.fromDb(dbCocktail, dbIngredients, instructions);
+    }
+
+    public void delete(final UUID uuid) {
+        final var rowsAffected = cocktailDao.delete(uuid);
+
+        if (rowsAffected == 0) {
+            throw new NoSuchResourceProblem(COCKTAIL, uuid.toString());
+        }
     }
 }

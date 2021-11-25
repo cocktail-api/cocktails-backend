@@ -30,8 +30,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import static de.slevermann.cocktails.backend.service.problem.ResourceType.COCKTAIL;
 import static de.slevermann.cocktails.backend.service.problem.ResourceType.INGREDIENT;
 import static java.util.UUID.randomUUID;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -289,5 +291,24 @@ public class CocktailServiceTest {
         assertEquals(2, ids.size());
         assertTrue(ids.contains(firstIngredient.getId().toString()));
         assertTrue(ids.contains(secondIngredient.getId().toString()));
+    }
+
+    @Test
+    void testDelete() {
+        when(cocktailDao.delete(any())).thenReturn(1);
+
+        assertDoesNotThrow(() -> cocktailService.delete(randomUUID()));
+    }
+
+    @Test
+    void testDeleteMissing() {
+        when(cocktailDao.delete(any())).thenReturn(0);
+        final var id = randomUUID();
+
+        final var ex = assertThrows(NoSuchResourceProblem.class,
+                () -> cocktailService.delete(id));
+
+        assertEquals(COCKTAIL, ex.getResourceType());
+        assertEquals(id.toString(), ex.getResourceId());
     }
 }
