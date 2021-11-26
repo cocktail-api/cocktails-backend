@@ -250,4 +250,30 @@ public class IngredientDaoTest extends DaoTestBase {
         ingredientDao.create(new DbCreateIngredient(type.id(), "another", "foo"));
         assertEquals(2, ingredientDao.countByType(type.id()));
     }
+
+    @Order(85)
+    @Test
+    void testSearch() {
+        ingredientDao.create(new DbCreateIngredient(type.id(),
+                "Dorem ipsum",
+                "And now for something completely different"));
+        ingredientDao.create(new DbCreateIngredient(type.id(),
+                "Unrelated",
+                "Lorem ipsum dolor sit amet, consectetur adipisici elit"));
+
+        final var result = ingredientDao.search("lorem ipsum", 0, 10);
+
+        assertEquals(2, result.size());
+        /*
+         * Both should be found, but Dorem ipsum is closer to "lorem ipsum" than "unrelated",
+         * and the order priority is on the name, not the description
+         */
+        assertEquals("Dorem ipsum", result.get(0).name());
+        assertEquals("Unrelated", result.get(1).name());
+
+        final var secondResult = ingredientDao.search("unrelated", 0, 10);
+
+        assertEquals(1, secondResult.size());
+        assertEquals("Unrelated", secondResult.get(0).name());
+    }
 }

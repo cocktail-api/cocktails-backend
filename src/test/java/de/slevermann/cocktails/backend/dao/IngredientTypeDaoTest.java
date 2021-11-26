@@ -179,4 +179,24 @@ class IngredientTypeDaoTest extends DaoTestBase {
         assertNull(ingredientTypeDao.findByNameAndNotId("newFunnyType", type.id()));
         assertNull(ingredientTypeDao.findByNameAndNotId("newFunnyType", type.id()));
     }
+
+    @Order(65)
+    @Test
+    void testSearch() {
+        final var firstType = ingredientTypeDao.create("Strong alcohol");
+        final var secondType = ingredientTypeDao.create("Soft alcohol");
+
+        final var results = ingredientTypeDao.search("alcohol", 0, 10);
+
+        assertEquals(2, results.size());
+
+        // "Soft alcohol" is more similar to "alcohol" than "Strong alcohol" on account of having fewer extra letters
+        assertEquals(firstType, results.get(1));
+        assertEquals(secondType, results.get(0));
+
+        final var secondSearch = ingredientTypeDao.search("strong", 0, 10);
+
+        assertEquals(1, secondSearch.size());
+        assertEquals(firstType, secondSearch.get(0));
+    }
 }

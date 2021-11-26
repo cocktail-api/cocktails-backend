@@ -71,4 +71,12 @@ public interface IngredientTypeDao {
             description = "Performance of ingredient type name and != id lookup",
             percentiles = {0.99, 0.95, 0.9, 0.5})
     DbIngredientType findByNameAndNotId(@Bind("name") final String name, @Bind("uuid") final UUID uuid);
+
+    @SqlQuery
+    @Timed(value = "types.search",
+            description = "Performance of ingredient type search",
+            percentiles = {0.99, 0.95, 0.9, 0.5})
+    List<DbIngredientType> search(@Bind("searchTerm") final String searchTerm,
+                                  @Bind("offset") final int offset,
+                                  @Bind("pageSize") final int pageSize);
 }

@@ -86,4 +86,22 @@ public interface IngredientDao {
             description = "Performance of ingredient counting by type",
             percentiles = {0.99, 0.95, 0.9, 0.5})
     long countByType(@Bind("type") final UUID uuid);
+
+    @SqlQuery
+    @Timed(value = "ingredients.search",
+            description = "Performance of ingredient search",
+            percentiles = {0.99, 0.95, 0.9, 0.5})
+    List<DbIngredient> search(@Bind("searchTerm") final String searchTerm,
+                              @Bind("likeSearchTerm") final String likeSearchTerm,
+                              @Bind("offset") final int offset,
+                              @Bind("pageSize") final int pageSize);
+
+    default List<DbIngredient> search(final String searchTerm,
+                                      final int offset,
+                                      final int pageSize) {
+        return search(searchTerm,
+                "%%%s%%".formatted(searchTerm),
+                offset,
+                pageSize);
+    }
 }

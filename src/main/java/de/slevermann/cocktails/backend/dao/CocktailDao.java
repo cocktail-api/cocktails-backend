@@ -2,10 +2,10 @@ package de.slevermann.cocktails.backend.dao;
 
 import de.slevermann.cocktails.backend.model.db.DbCocktail;
 import de.slevermann.cocktails.backend.model.db.DbCocktailIngredient;
+import de.slevermann.cocktails.backend.model.db.DbInstruction;
 import de.slevermann.cocktails.backend.model.db.create.DbCreateCocktail;
 import de.slevermann.cocktails.backend.model.db.create.DbCreateCocktailIngredient;
 import de.slevermann.cocktails.backend.model.db.create.DbCreateInstruction;
-import de.slevermann.cocktails.backend.model.db.DbInstruction;
 import io.micrometer.core.annotation.Timed;
 import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.customizer.BindMethods;
@@ -128,4 +128,23 @@ public interface CocktailDao {
             description = "Performance of cocktail existence",
             percentiles = {0.99, 0.95, 0.9, 0.5})
     boolean exists(@Bind("uuid") final UUID uuid);
+
+    @SqlQuery
+    @Timed(value = "cocktails.search",
+            description = "Performance of cocktail search",
+            percentiles = {0.99, 0.95, 0.9, 0.5})
+    List<DbCocktail> search(@Bind("searchTerm") final String searchTerm,
+                              @Bind("likeSearchTerm") final String likeSearchTerm,
+                              @Bind("offset") final int offset,
+                              @Bind("pageSize") final int pageSize);
+
+    default List<DbCocktail> search(final String searchTerm,
+                                      final int offset,
+                                      final int pageSize) {
+        return search(searchTerm,
+                "%%%s%%".formatted(searchTerm),
+                offset,
+                pageSize);
+    }
+
 }

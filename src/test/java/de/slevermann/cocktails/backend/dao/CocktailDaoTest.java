@@ -340,4 +340,28 @@ public class CocktailDaoTest extends DaoTestBase {
         assertFalse(cocktailDao.exists(UUID.randomUUID()));
         assertTrue(cocktailDao.exists(secondCocktail.id()));
     }
+
+    @Order(110)
+    @Test
+    void testSearch() {
+        cocktailDao.create(new DbCreateCocktail("Dorem ipsum",
+                "And now for something completely different"));
+        cocktailDao.create(new DbCreateCocktail("Unrelated",
+                "Lorem ipsum dolor sit amet, consectetur adipisici elit"));
+
+        final var result = cocktailDao.search("lorem ipsum", 0, 10);
+
+        assertEquals(2, result.size());
+        /*
+         * Both should be found, but Dorem ipsum is closer to "lorem ipsum" than "unrelated",
+         * and the order priority is on the name, not the description
+         */
+        assertEquals("Dorem ipsum", result.get(0).name());
+        assertEquals("Unrelated", result.get(1).name());
+
+        final var secondResult = cocktailDao.search("unrelated", 0, 10);
+
+        assertEquals(1, secondResult.size());
+        assertEquals("Unrelated", secondResult.get(0).name());
+    }
 }
